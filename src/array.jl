@@ -24,7 +24,7 @@ end
 size(array::IntArray) = array.size
 length(array::IntArray) = prod(array.size)
 
-function getindex{w,T}(array::IntArray{w,T}, i::Integer)
+@inline function getindex{w,T}(array::IntArray{w,T}, i::Integer)
     if i < 0 || i > endof(array)
         throw(BoundsError())
     end
@@ -36,7 +36,7 @@ function getindex{w,T}(array::IntArray{w,T}, i::Integer, j::Integer...)
     return array[sub2ind(array.size, i, j...)]
 end
 
-function setindex!(array::IntArray, x::Unsigned, i::Integer)
+@inline function setindex!(array::IntArray, x::Unsigned, i::Integer)
     if i < 0 || i > endof(array)
         throw(BoundsError())
     end
