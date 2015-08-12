@@ -41,3 +41,28 @@ julia> ivec[2] = 0x03
 julia> ivec[2]
 0x03
 ```
+
+## Benchmark
+
+Micro benchmarks can be found in the [benchmark](./benchmark) directory.
+
+The `getindex` and `setindex!` functions are 2-7 times slower than raw arrays due to the heavy bit operations.
+
+![Benchmark of getindex on UInt8](./benchmark/getindex_UInt8.png?raw=true)
+![Benchmark of setindex on UInt8](./benchmark/setindex_UInt8.png?raw=true)
+
+---
+
+```
+julia> versioninfo()
+Julia Version 0.4.0-dev+6632
+Commit d5b880d* (2015-08-11 18:40 UTC)
+Platform Info:
+  System: Darwin (x86_64-apple-darwin14.4.0)
+  CPU: Intel(R) Core(TM) i5-4288U CPU @ 2.60GHz
+  WORD_SIZE: 64
+  BLAS: libopenblas (USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell)
+  LAPACK: libopenblas
+  LIBM: libopenlibm
+  LLVM: libLLVM-3.3
+```
