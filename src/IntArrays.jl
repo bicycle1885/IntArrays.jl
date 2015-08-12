@@ -4,6 +4,7 @@ export IntArray, IntVector, IntMatrix
 
 import Base:
     convert,
+    call,
     getindex,
     setindex!,
     size,
