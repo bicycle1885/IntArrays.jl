@@ -3,6 +3,8 @@ using FactCheck
 
 srand(12345)
 
+const Ts = (UInt8, UInt16, UInt32, UInt64)
+
 facts("IntVector") do
     context("conversion") do
         data = [0x00, 0x01]
@@ -13,7 +15,7 @@ facts("IntVector") do
 
     context("unsigned integers") do
         n = 1000
-        for T in (UInt8, UInt16, UInt32, UInt64)
+        for T in Ts
             data = rand(T(0):T(100), n)
             ivec = IntVector{10,T}(data)
             for i in 1:endof(data)
@@ -32,6 +34,14 @@ facts("IntVector") do
             end
         end
     end
+
+    context("empty") do
+        for T in Ts
+            ivec = IntVector{3,T}()
+            @fact size(ivec) --> (0,)
+            @fact length(ivec) --> 0
+        end
+    end
 end
 
 facts("IntMatrix") do
@@ -45,7 +55,7 @@ facts("IntMatrix") do
     context("unsigned integers") do
         m = 41
         n = 17
-        for T in (UInt8, UInt16, UInt32, UInt64)
+        for T in Ts
             data = rand(T(0):T(100), m, n)
             imat = IntMatrix{10,T}(data)
             for i in 1:m, j in 1:n
@@ -64,6 +74,14 @@ facts("IntMatrix") do
                 @fact imat[i,j] --> data[i,j]
                 @fact typeof(imat[i,j]) --> T
             end
+        end
+    end
+
+    context("empty") do
+        for T in Ts
+            imat = IntMatrix{3,T}()
+            @fact size(imat) --> (0, 0)
+            @fact length(imat) --> 0
         end
     end
 end
