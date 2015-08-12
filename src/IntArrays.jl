@@ -8,6 +8,7 @@ import Base:
     setindex!,
     length
 
+include("buffer.jl")
 include("intvectors.jl")
 
 end # module
