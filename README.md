@@ -4,6 +4,8 @@
 
 `IntArray` is an array of packed integers.
 
+The `IntArray` type is defined as follows:
+
 ```julia
 type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
 ```
@@ -19,6 +21,8 @@ Hence, the total size is about `w * length(int_array)` bits.
 
 You can think of it as a generalization of `BitArray` defined in the standard library:
 `BitArray` can store only `Bool` values, whereas `IntArray` can store any (unsigned) integers.
+
+Like `Vector{T}` and `Matrix{T}` in `Base`, `IntVector{w,T}` and `IntMatrix{w,T}` are also defined as a type alias of `IntArray{w,T,n}`.
 
 ## Example
 
