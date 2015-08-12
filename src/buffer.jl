@@ -1,3 +1,4 @@
+# internal data for packed integers
 type Buffer{w}
     data::Vector{UInt64}
     len::Int
@@ -35,7 +36,7 @@ function setindex!{w}(buf::Buffer{w}, x::UInt64, i::Integer)
     return x
 end
 
-function rmask(w::Int)
+function rmask(w)
     ~UInt64(0) >> (W - w)
 end
 
