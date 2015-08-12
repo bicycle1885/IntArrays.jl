@@ -20,6 +20,9 @@ size(array::IntArray) = array.size
 length(array::IntArray) = prod(array.size)
 
 function getindex{w,T}(array::IntArray{w,T}, i::Integer)
+    if i < 0 || i > endof(array)
+        throw(BoundsError())
+    end
     return array.buffer[i] % T
 end
 
@@ -29,6 +32,9 @@ function getindex{w,T}(array::IntArray{w,T}, i::Integer, j::Integer...)
 end
 
 function setindex!(array::IntArray, x::Unsigned, i::Integer)
+    if i < 0 || i > endof(array)
+        throw(BoundsError())
+    end
     return array.buffer[i] = x % UInt64
 end
 

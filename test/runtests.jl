@@ -32,6 +32,7 @@ facts("IntVector") do
             for i in 1:endof(data)
                 @fact ivec[i] --> data[i]
             end
+            @fact_throws BoundsError ivec[n+1]
         end
     end
 
@@ -40,6 +41,8 @@ facts("IntVector") do
             ivec = IntVector{3,T}()
             @fact size(ivec) --> (0,)
             @fact length(ivec) --> 0
+            @fact_throws BoundsError ivec[1]
+            @fact_throws BoundsError ivec[1] = 0x00
         end
     end
 end
@@ -74,6 +77,9 @@ facts("IntMatrix") do
                 @fact imat[i,j] --> data[i,j]
                 @fact typeof(imat[i,j]) --> T
             end
+            @fact_throws BoundsError imat[m+1,n]
+            @fact_throws BoundsError imat[m,n+1]
+            @fact_throws BoundsError imat[m+1,n+1]
         end
     end
 
@@ -82,6 +88,8 @@ facts("IntMatrix") do
             imat = IntMatrix{3,T}()
             @fact size(imat) --> (0, 0)
             @fact length(imat) --> 0
+            @fact_throws BoundsError imat[1,1]
+            @fact_throws BoundsError imat[1,1] = 0x00
         end
     end
 end
