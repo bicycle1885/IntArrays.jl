@@ -22,6 +22,17 @@ facts("IntVector") do
         end
     end
 
+    context("several bit widths") do
+        n = 123
+        for T in Ts, w in 1:sizeof(T)*8
+            data = rand(T(0):T(2)^w-T(1), n)
+            ivec = IntVector{w,T}(data)
+            for i in 1:n
+                @fact ivec[i] --> data[i]
+            end
+        end
+    end
+
     context("unsigned integers") do
         n = 1000
         for T in Ts
