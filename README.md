@@ -18,7 +18,6 @@ where
 
 This works like normal arrays, but each element is packed in a buffer as compact as possible.
 Hence, the total size is about `w * length(int_array)` bits.
-
 You can think of it as a generalization of `BitArray` defined in the standard library:
 `BitArray` can store only `Bool` values, whereas `IntArray` can store any (unsigned) integers.
 
@@ -50,7 +49,8 @@ julia> ivec[2]
 
 Micro benchmarks can be found in the [benchmark](./benchmark) directory.
 
-The `getindex` and `setindex!` functions are 2-7 times slower than raw arrays due to the heavy bit operations.
+The `getindex` and `setindex!` methods of `IntArray` are 2-7 times slower than those of raw arrays due to the heavy bit operations.
+Any pull request that fills the gap is welcome!
 
 ![Benchmark of getindex on UInt8](./benchmark/getindex_UInt8.png?raw=true)
 ![Benchmark of setindex on UInt8](./benchmark/setindex_UInt8.png?raw=true)
@@ -70,3 +70,8 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-3.3
 ```
+
+## Plan
+
+* Behave more like normal arrays
+* Store signed integers
