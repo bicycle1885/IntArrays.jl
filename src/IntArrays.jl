@@ -1,5 +1,13 @@
 module IntArrays
 
-# package code goes here
+export IntVector
+
+import Base:
+    convert,
+    getindex,
+    setindex!,
+    length
+
+include("intvectors.jl")
 
 end # module
