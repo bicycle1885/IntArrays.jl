@@ -1,7 +1,12 @@
 type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
     buffer::Buffer{w}
     size::NTuple{n,Int}
+    function IntArray(buffer::Buffer{w}, size::NTuple{n,Int})
+        new(buffer, size)
+    end
 end
+
+call{w,T}(::Type{IntArray{w,T}}, len::Integer) = IntArray{w,T,1}(Buffer{w}(len), (len,))
 
 function convert{w,T,n}(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n})
     len = length(array)

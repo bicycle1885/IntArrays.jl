@@ -13,6 +13,15 @@ facts("IntVector") do
         @fact convert(IntVector{1}, data) --> ivec
     end
 
+    context("allocation") do
+        for T in Ts
+            ivec = IntVector{3,T}(10)
+            @fact length(ivec) --> 10
+            @fact size(ivec) --> (10,)
+            @fact typeof(ivec) --> IntArray{3,T,1}
+        end
+    end
+
     context("unsigned integers") do
         n = 1000
         for T in Ts
@@ -53,6 +62,15 @@ facts("IntMatrix") do
         imat = IntMatrix{2}(data)
         @fact typeof(imat) --> IntArray{2,UInt8,2}
         @fact convert(IntMatrix{2}, data) --> imat
+    end
+
+    context("allocation") do
+        for T in Ts
+            imat = IntMatrix{3,T}(4, 5)
+            @fact length(imat) --> 20
+            @fact size(imat) --> (4, 5)
+            @fact typeof(imat) --> IntArray{3,T,2}
+        end
     end
 
     context("unsigned integers") do
