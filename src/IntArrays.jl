@@ -1,14 +1,17 @@
 module IntArrays
 
-export IntVector
+export IntArray, IntVector, IntMatrix
 
 import Base:
     convert,
     getindex,
     setindex!,
+    size,
     length
 
 include("buffer.jl")
-include("intvectors.jl")
+include("array.jl")
+include("vector.jl")
+include("matrix.jl")
 
 end # module
