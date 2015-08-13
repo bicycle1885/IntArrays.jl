@@ -40,6 +40,15 @@ facts("IntArray") do
         @fact sizeof(IntVector{3}(data)) --> less_than(sizeof(data))
         @fact sizeof(IntVector{4}(data)) --> less_than(sizeof(data))
     end
+    context("fill!") do
+        n = 100
+        data = rand(0x00:0x03, n)
+        ivec = IntVector{2}(data)
+        for x in 0x00:0x03
+            fill!(ivec, x)
+            @fact ivec --> ones(UInt8, n) * x
+        end
+    end
 end
 
 facts("IntVector") do

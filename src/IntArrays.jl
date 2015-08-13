@@ -9,7 +9,8 @@ import Base:
     setindex!,
     size,
     length,
-    sizeof
+    sizeof,
+    fill!
 
 include("buffer.jl")
 include("array.jl")

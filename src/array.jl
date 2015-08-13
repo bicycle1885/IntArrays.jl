@@ -44,9 +44,26 @@ end
     if i ≤ 0 || i > endof(array)
         throw(BoundsError())
     end
+    return unsafe_setindex!(array, x, i)
+end
+
+@inline function unsafe_setindex!(array::IntArray, x::Unsigned, i::Integer)
     return array.buffer[i] = x % UInt64
 end
 
 function setindex!(array::IntArray, x::Integer, i::Integer, j::Integer...)
     return array[sub2ind(array.size, i, j...)] = convert(UInt64, x)
+end
+
+
+function fill!{w}(array::IntArray{w}, x::Integer)
+    if x == 0
+        fill0!(array.buffer)
+    elseif x == (1 << w) - 1
+        fill1!(array.buffer)
+    else
+        x′ = convert(UInt64, x & rmask(w))
+        fill!(array.buffer, x′, 1, length(array))
+    end
+    return array
 end

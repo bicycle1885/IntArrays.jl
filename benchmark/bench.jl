@@ -29,28 +29,48 @@ function bench_setindex(array, n)
     return t / (n * length(array))
 end
 
+function bench_fill0(array, n)
+    fill!(array, 0)
+    t = @elapsed for _ in 1:n
+        fill!(array, 0)
+    end
+    return t / n
+end
+
+function bench_fill1(array, n)
+    fill!(array, 0)
+    t = @elapsed for _ in 1:n
+        fill!(array, 1)
+    end
+    return t / n
+end
+
 let
     baseline = !isempty(ARGS) && shift!(ARGS) == "--baseline"
     Ts = [UInt8, UInt16, UInt32, UInt64]
     size = 100_000
     n = 100
+    columns = ["type", "eltype", "w", "bench_getindex", "bench_setindex", "bench_fill0", "bench_fill1"]
     if baseline
-        columns = ["type", "eltype", "bench_getindex", "bench_setindex"]
+        filter!(x -> x != "w", columns)
         println(join(columns, '\t'))
         for T in Ts
             array = Vector{T}(rand(typemin(T):typemax(T), size))
             print(typeof(array), '\t', eltype(array), '\t')
             print(bench_getindex(array, n), '\t')
-            print(bench_setindex(array, n), '\n')
+            print(bench_setindex(array, n), '\t')
+            print(bench_fill0(array, 10), '\t')
+            print(bench_fill1(array, 10), '\n')
         end
     else
-        columns = ["type", "eltype", "w", "bench_getindex", "bench_setindex"]
         println(join(columns, '\t'))
         for T in Ts, w in 1:sizeof(T)*8
             array = IntVector{w,T}(rand(typemin(T):typemax(T), size))
             print(typeof(array), '\t', eltype(array), '\t', w, '\t')
             print(bench_getindex(array, n), '\t')
-            print(bench_setindex(array, n), '\n')
+            print(bench_setindex(array, n), '\t')
+            print(bench_fill0(array, 10), '\t')
+            print(bench_fill1(array, 10), '\n')
         end
     end
 end

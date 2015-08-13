@@ -84,3 +84,34 @@ end
 @inline function setindex!(buf::Buffer{64}, x::UInt64, i::Integer)
     @inbounds return buf.data[i] = x
 end
+
+
+function fill!{w}(buf::Buffer{w}, x::UInt64, lo::Int, hi::Int)
+    for i in lo:hi
+        setindex!(buf, x, i)
+    end
+    return buf
+end
+
+for w in [1, 2, 4, 8, 16, 32, 64]
+    @eval begin
+        function fill!(buf::Buffer{$w}, x::UInt64, ::Int, ::Int)
+            chunk = UInt64(0)
+            for _ in 1:div(W, $w)
+                chunk = chunk << $w | x
+            end
+            fill!(buf.data, chunk)
+            return buf
+        end
+    end
+end
+
+function fill0!(buf::Buffer)
+    fill!(buf.data, UInt64(0))
+    return buf
+end
+
+function fill1!(buf::Buffer)
+    fill!(buf.data, ~UInt64(0))
+    return buf
+end
