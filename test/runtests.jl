@@ -11,10 +11,17 @@ facts("IntArray") do
         imat = IntArray{3}(data)
         @fact typeof(imat) --> IntArray{3,UInt8,2}
         @fact eltype(imat) --> UInt8
-        @fact imat[1,1] --> 0x00
-        @fact imat[1,2] --> 0x01
-        @fact imat[2,1] --> 0x02
-        @fact imat[2,2] --> 0x03
+    end
+    context("getindex") do
+        data = [0x00, 0x01, 0x02, 0x03, 0x04]
+        ivec = IntArray{3}(data)
+        @fact_throws BoundsError ivec[0]
+        @fact ivec[1] --> 0x00
+        @fact ivec[2] --> 0x01
+        @fact ivec[3] --> 0x02
+        @fact ivec[4] --> 0x03
+        @fact ivec[5] --> 0x04
+        @fact_throws BoundsError ivec[6]
     end
     context("setindex") do
         data = [0x00 0x00; 0x00 0x00]
