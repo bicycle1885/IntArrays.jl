@@ -4,7 +4,7 @@ srand(12345)
 
 function bench_getindex(array, n)
     # warming up
-    for i in 1:div(endof(array), 10)
+    for i in 1:endof(array)
         array[i]
     end
     t = @elapsed for _ in 1:n
@@ -18,7 +18,7 @@ end
 function bench_setindex(array, n)
     # warming up
     x = 0x00
-    for i in 1:div(endof(array), 10)
+    for i in 1:endof(array)
         array[i] = x
     end
     t = @elapsed for _ in 1:n
