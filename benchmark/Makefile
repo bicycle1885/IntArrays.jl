@@ -9,4 +9,4 @@ intvector.tsv:
 	$(JULIA) bench.jl > $@
 
 clean:
-	rm *.tsv
+	rm -f *.tsv

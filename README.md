@@ -52,8 +52,15 @@ Micro benchmarks can be found in the [benchmark](./benchmark) directory.
 The `getindex` and `setindex!` methods of `IntArray` are 2-7 times slower than those of raw arrays due to the heavy bit operations.
 Any pull request that fills the gap is welcome!
 
+**UInt8**
+
 ![Benchmark of getindex on UInt8](./benchmark/getindex_UInt8.png?raw=true)
 ![Benchmark of setindex on UInt8](./benchmark/setindex_UInt8.png?raw=true)
+
+**UInt64**
+
+![Benchmark of getindex on UInt64](./benchmark/getindex_UInt64.png?raw=true)
+![Benchmark of setindex on UInt64](./benchmark/setindex_UInt64.png?raw=true)
 
 ---
 
