@@ -5,6 +5,29 @@ srand(12345)
 
 const Ts = (UInt8, UInt16, UInt32, UInt64)
 
+facts("IntArray") do
+    context("conversion") do
+        data = [0x00 0x01; 0x02 0x03]
+        imat = IntArray{3}(data)
+        @fact typeof(imat) --> IntArray{3,UInt8,2}
+        @fact eltype(imat) --> UInt8
+        @fact imat[1,1] --> 0x00
+        @fact imat[1,2] --> 0x01
+        @fact imat[2,1] --> 0x02
+        @fact imat[2,2] --> 0x03
+    end
+    context("setindex") do
+        data = [0x00 0x00; 0x00 0x00]
+        imat = IntArray{2}(data)
+        @fact (imat[1,1] = 0x01) --> 0x01
+        @fact imat[1,1] --> 0x01
+        @fact (imat[1,2] = 2) --> 0x02
+        @fact imat[1,2] --> 0x02
+        @fact (imat[2,1] = 0x0003) --> 0x03
+        @fact imat[2,1] --> 0x03
+    end
+end
+
 facts("IntVector") do
     context("conversion") do
         data = [0x00, 0x01]

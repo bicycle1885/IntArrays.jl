@@ -45,6 +45,6 @@ end
     return array.buffer[i] = x % UInt64
 end
 
-function setindex!(array::IntArray, x::Unsigned, i::Integer, j::Integer...)
-    return array[sub2ind(array.size, i, j...)] = x
+function setindex!(array::IntArray, x::Integer, i::Integer, j::Integer...)
+    return array[sub2ind(array.size, i, j...)] = convert(UInt64, x)
 end
