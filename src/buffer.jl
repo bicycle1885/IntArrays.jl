@@ -11,6 +11,7 @@ end
 # word size
 const W = 64
 
+
 @inline function rmask(w)
     ~UInt64(0) >> (W - w)
 end
@@ -20,8 +21,9 @@ end
 end
 
 @inline function divrem64(n::Integer)
-    return (n >> 6, n & 0b111111)
+    n >> 6, n & 0b111111
 end
+
 
 @inline function getindex{w}(buf::Buffer{w}, i::Integer)
     data = buf.data
@@ -36,6 +38,7 @@ end
     return chunk
 end
 
+# these width values don't cross a boundary, therefore branching can be safely removed
 for w in [1, 2, 4, 8, 16, 32]
     @eval begin
         @inline function getindex(buf::Buffer{$w}, i::Integer)
@@ -50,6 +53,7 @@ end
     @inbounds return buf.data[i]
 end
 
+
 @inline function setindex!{w}(buf::Buffer{w}, x::UInt64, i::Integer)
     data = buf.data
     k, r = divrem64((i - 1) * w)
@@ -62,7 +66,6 @@ end
     return x
 end
 
-# these width values don't cross a boundary, therefore branching can be safely removed
 for w in [1, 2, 4, 8, 16, 32]
     @eval begin
         @inline function setindex!(buf::Buffer{$w}, x::UInt64, i::Integer)

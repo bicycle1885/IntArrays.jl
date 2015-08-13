@@ -33,6 +33,13 @@ facts("IntArray") do
         @fact (imat[2,1] = 0x0003) --> 0x03
         @fact imat[2,1] --> 0x03
     end
+    context("sizeof") do
+        n = 100
+        data = rand(0x00:0x03, n)
+        @fact sizeof(IntVector{2}(data)) --> less_than(sizeof(data))
+        @fact sizeof(IntVector{3}(data)) --> less_than(sizeof(data))
+        @fact sizeof(IntVector{4}(data)) --> less_than(sizeof(data))
+    end
 end
 
 facts("IntVector") do

@@ -8,7 +8,8 @@ import Base:
     getindex,
     setindex!,
     size,
-    length
+    length,
+    sizeof
 
 include("buffer.jl")
 include("array.jl")
