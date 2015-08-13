@@ -2,8 +2,10 @@
 type Buffer{w}
     data::Vector{UInt64}
     len::Int
-    function Buffer(len::Integer)
-        new(zeros(UInt64, cld(len * w, W)), len)
+    function Buffer(len::Integer, mmap::Bool=false)
+        buflen = cld(len * w, W)
+        data = mmap ? Mmap.mmap(Vector{UInt64}, buflen) : Vector{UInt64}(buflen)
+        return new(data, len)
     end
 end
 

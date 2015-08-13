@@ -6,7 +6,9 @@ type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
     end
 end
 
-call{w,T}(::Type{IntArray{w,T}}, len::Integer) = IntArray{w,T,1}(Buffer{w}(len), (len,))
+function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
+    return IntArray{w,T,1}(Buffer{w}(len, mmap), (len,))
+end
 
 function convert{w,T,n}(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n})
     len = length(array)

@@ -122,3 +122,42 @@ facts("IntMatrix") do
         end
     end
 end
+
+facts("Mmap backed array") do
+    context("small") do
+        n = 10
+        ivec = IntArray{2,UInt8}(n, true)
+        @fact (ivec[2] = 0x02) --> 0x02
+        @fact ivec[2] --> 0x02
+        fill!(ivec, 0x00)
+        for i in 1:n
+            @fact ivec[i] --> 0x00
+        end
+        fill!(ivec, 0x03)
+        for i in 1:n
+            @fact ivec[i] --> 0x03
+        end
+    end
+    context("large") do
+        n = 2^30
+        ivec = IntArray{2,UInt8}(n, true)
+        @fact (ivec[2] = 0x02) --> 0x02
+        @fact ivec[2] --> 0x02
+        fill!(ivec, 0x01)
+        @fact ivec[1] --> 0x01
+        @fact ivec[div(n,2)] --> 0x01
+        @fact ivec[end] --> 0x01
+    end
+    context("vector") do
+        n = 10
+        ivec = IntVector{2,UInt16}(n, true)
+        @fact (ivec[2] = 0x02) --> 0x02
+        @fact ivec[2] --> 0x02
+    end
+    context("matrix") do
+        m, n = 3, 10
+        imat = IntMatrix{2,UInt16}(m, n, true)
+        @fact (imat[1,3] = 0x02) --> 0x02
+        @fact imat[1,3] --> 0x02
+    end
+end
