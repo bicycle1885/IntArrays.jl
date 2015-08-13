@@ -12,6 +12,18 @@ end
 # word size
 const W = 64
 
+@inline function rmask(w)
+    ~UInt64(0) >> (W - w)
+end
+
+@inline function mask(r, w)
+    rmask(w) << (W - (r + w))
+end
+
+@inline function divrem64(n::Integer)
+    return (n >> 6, n & 0b111111)
+end
+
 @inline function getindex{w}(buf::Buffer{w}, i::Integer)
     data = buf.data
     k, r = divrem64((i - 1) * w)
@@ -25,8 +37,21 @@ const W = 64
     return chunk
 end
 
+for w in [1, 2, 4, 8, 16, 32]
+    @eval begin
+        @inline function getindex(buf::Buffer{$w}, i::Integer)
+            k, r = divrem64((i - 1) * $w)
+            @inbounds chunk = (buf.data[k+1] >> ($(W - w) - r)) & $(rmask(w))
+            return chunk
+        end
+    end
+end
+
+@inline function getindex(buf::Buffer{64}, i::Integer)
+    @inbounds return buf.data[i]
+end
+
 @inline function setindex!{w}(buf::Buffer{w}, x::UInt64, i::Integer)
-    x &= rmask(w)
     data = buf.data
     k, r = divrem64((i - 1) * w)
     if r + w ≤ W
@@ -38,14 +63,22 @@ end
     return x
 end
 
-@inline function rmask(w)
-    ~UInt64(0) >> (W - w)
+# these width values don't cross a boundary, therefore branching can be safely removed
+for w in [1, 2, 4, 8, 16, 32]
+    @eval begin
+        @inline function setindex!(buf::Buffer{$w}, x::UInt64, i::Integer)
+            k, r = divrem64((i - 1) * $w)
+            k += 1
+            @inbounds a = buf.data[k]
+            b = x << ($(W - w) - r)
+            mask = $(rmask(w)) << ($(W - w) - r)
+            # see: https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
+            @inbounds buf.data[k] = a $ ((a $ b) & mask)
+            return x
+        end
+    end
 end
 
-@inline function mask(r, w)
-    rmask(w) << (W - (r + w))
-end
-
-@inline function divrem64(n::Integer)
-    return (n >> 6, n & 0b111111)
+@inline function setindex!(buf::Buffer{64}, x::UInt64, i::Integer)
+    @inbounds return buf.data[i] = x
 end
