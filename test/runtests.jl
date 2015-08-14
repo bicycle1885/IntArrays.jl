@@ -133,6 +133,33 @@ facts("IntVector") do
             @fact_throws BoundsError ivec[1] = 0x00
         end
     end
+
+    context("push!/pop!") do
+        for T in Ts
+            ivec = IntVector{4,T}()
+            @fact length(ivec) --> 0
+            @fact push!(ivec, 3) === ivec --> true
+            @fact ivec[end] === T(3) --> true
+            @fact length(ivec) --> 1
+            @fact pop!(ivec) --> T(3)
+            @fact length(ivec) --> 0
+            len = 0
+            vec = T[]
+            for x in T(0):T(10)
+                push!(ivec, x)
+                push!(vec, x)
+                len += 1
+                @fact ivec[end] --> x
+                @fact length(ivec) --> len
+            end
+            while !isempty(ivec)
+                x = pop!(ivec)
+                y = pop!(vec)
+                @fact x === y --> true
+            end
+            @fact isempty(ivec) --> true
+        end
+    end
 end
 
 facts("IntMatrix") do

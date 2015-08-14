@@ -11,6 +11,11 @@ end
 # word size
 const W = 64
 
+function resize!{w}(buffer::Buffer{w}, len::Integer)
+    buflen = cld(len * w, W)
+    resize!(buffer.data, buflen)
+    return buffer
+end
 
 @inline function rmask(w)
     ~UInt64(0) >> (W - w)

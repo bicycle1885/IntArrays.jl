@@ -13,7 +13,10 @@ import Base:
     sizeof,
     similar,
     fill!,
-    copy!
+    copy!,
+    resize!,
+    push!,
+    pop!
 
 include("buffer.jl")
 include("array.jl")
