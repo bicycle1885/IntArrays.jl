@@ -10,6 +10,14 @@ function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
     return IntArray{w,T,1}(Buffer{w}(len, mmap), (len,))
 end
 
+function call{w,T,n}(::Type{IntArray{w,T}}, dims::NTuple{n,Int}, mmap::Bool=false)
+    return IntArray{w,T,n}(Buffer{w}(prod(dims), mmap), dims)
+end
+
+function call{w,T,n}(::Type{IntArray{w,T,n}}, dims::NTuple{n,Int}, mmap::Bool=false)
+    return IntArray{w,T}(dims, mmap)
+end
+
 function convert{w,T,n}(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n})
     len = length(array)
     buf = Buffer{w}(len)
@@ -56,6 +64,12 @@ function setindex!(array::IntArray, x::Integer, i::Integer, j::Integer...)
 end
 
 
+function similar{w}(array::IntArray{w}, T, dims::Dims)
+    n = length(dims)
+    IntArray{w,T,n}(dims)
+end
+
+
 function fill!{w}(array::IntArray{w}, x::Integer)
     if x == 0
         fill0!(array.buffer)
@@ -66,4 +80,20 @@ function fill!{w}(array::IntArray{w}, x::Integer)
         fill!(array.buffer, x′, 1, length(array))
     end
     return array
+end
+
+
+function copy!{w}(a::IntArray{w}, b::IntArray{w})
+    len_a = length(a)
+    len_b = length(b)
+    if len_a < len_b
+        throw(BoundsError())
+    elseif len_a == len_b
+        copy!(a.buffer.data, b.buffer.data)
+    else
+        for i in 1:len_b
+            a[i] = b[i]
+        end
+    end
+    return a
 end

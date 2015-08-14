@@ -40,6 +40,28 @@ facts("IntArray") do
         @fact sizeof(IntVector{3}(data)) --> less_than(sizeof(data))
         @fact sizeof(IntVector{4}(data)) --> less_than(sizeof(data))
     end
+    context("similar") do
+        data = rand(0x00:0x07, (3, 4))
+        imat = IntMatrix{3,UInt8}(data)
+        @fact typeof(similar(imat)) --> typeof(imat)
+        @fact size(similar(imat)) --> (3, 4)
+    end
+    context("copy!") do
+        data = rand(0x00:0x03, 30)
+        ivec = IntVector{2,UInt8}(data)
+        @fact copy(ivec) --> ivec
+        ivec′ = similar(ivec)
+        @fact copy!(ivec′, ivec) === ivec′ --> true
+        @fact ivec′ --> ivec
+        # difference length
+        ivec′ = IntVector{2,UInt8}(10)
+        @fact_throws BoundsError copy!(ivec′, ivec)
+        ivec′ = IntVector{2,UInt8}(50)
+        old = copy(ivec′[31:end])
+        @fact copy!(ivec′, ivec) === ivec′ --> true
+        @fact ivec′[1:30] == ivec[1:end] --> true
+        @fact ivec′[31:end] == old --> true
+    end
     context("fill!") do
         n = 100
         data = rand(0x00:0x03, n)
