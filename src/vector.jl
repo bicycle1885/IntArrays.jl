@@ -1,13 +1,13 @@
 typealias IntVector{w,T} IntArray{w,T,1}
 
 function call{w,T}(::Type{IntVector{w,T}}, len::Integer, mmap::Bool=false)
-    IntArray{w,T,1}(Buffer{w}(len, mmap), (len,))
+    return IntArray{w,T}((len,), mmap)
 end
 
-function convert{w,T}(::Type{IntVector{w}}, array::AbstractVector{T})
-    return convert(IntArray{w,T,1}, array)
+function call{w,T}(::Type{IntVector{w,T}}, mmap::Bool=false)
+    return IntArray{w,T}((0,), mmap)
 end
 
-function convert{w,T}(::Type{IntVector{w,T}})
-    return IntArray{w,T,1}(Buffer{w}(0), (0,))
+function convert{w,T}(::Type{IntVector{w}}, vector::AbstractVector{T})
+    return convert(IntArray{w,T,1}, vector)
 end

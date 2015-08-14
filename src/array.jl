@@ -6,12 +6,13 @@ type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
     end
 end
 
-function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
-    return IntArray{w,T,1}(Buffer{w}(len, mmap), (len,))
-end
-
+# call this function when creating an array
 function call{w,T,n}(::Type{IntArray{w,T}}, dims::NTuple{n,Int}, mmap::Bool=false)
     return IntArray{w,T,n}(Buffer{w}(prod(dims), mmap), dims)
+end
+
+function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
+    return IntArray{w,T}((len,), mmap)
 end
 
 function call{w,T,n}(::Type{IntArray{w,T,n}}, dims::NTuple{n,Int}, mmap::Bool=false)
@@ -19,12 +20,11 @@ function call{w,T,n}(::Type{IntArray{w,T,n}}, dims::NTuple{n,Int}, mmap::Bool=fa
 end
 
 function convert{w,T,n}(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n})
-    len = length(array)
-    buf = Buffer{w}(len)
-    for i in 1:len
-        buf[i] = array[i] % UInt64
+    iarray = IntArray{w,T}(size(array))
+    @inbounds for i in eachindex(array)
+        iarray[i] = array[i]
     end
-    return IntArray{w,T,n}(buf, size(array))
+    return iarray
 end
 
 function convert{w,T,n}(::Type{IntArray{w}}, array::AbstractArray{T,n})
