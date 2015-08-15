@@ -29,3 +29,38 @@ function pop!(vector::IntVector)
     resize!(vector, length(vector) - 1)
     return x
 end
+
+radixsort(vector::IntVector) = radixsort!(copy(vector))
+
+function radixsort!{w}(vector::IntVector{w})
+    return radixsort!(vector, 1, length(vector), w)
+end
+
+function radixsort!{w}(v::IntVector{w}, lo, hi, k)
+    @assert 1 ≤ k ≤ w
+    if lo > hi
+        return v
+    end
+    i, j = lo, hi
+    bit_k = 1 << (k - 1)
+    while i < j
+        v_i = v[i]
+        if v_i & bit_k == 0
+            i += 1
+        else
+            v[i], v[j] = v[j], v_i
+            j -= 1
+        end
+    end
+    @assert i == j
+    if k ≥ 2
+        if v[i] & bit_k != 0
+            i -= 1
+        else
+            j += 1
+        end
+        radixsort!(v, lo, i, k - 1)
+        radixsort!(v, j, hi, k - 1)
+    end
+    return v
+end

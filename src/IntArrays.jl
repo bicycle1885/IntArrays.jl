@@ -1,6 +1,8 @@
 module IntArrays
 
-export IntArray, IntVector, IntMatrix
+export IntArray, IntVector, IntMatrix,
+    radixsort,
+    radixsort!
 
 import Base:
     convert,

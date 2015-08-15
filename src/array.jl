@@ -42,6 +42,10 @@ sizeof(array::IntArray) = sizeof(array.buffer.data) + sizeof(array.size)
     if i ≤ 0 || i > endof(array)
         throw(BoundsError())
     end
+    return unsafe_getindex(array, i)
+end
+
+@inline function unsafe_getindex{w,T}(array::IntArray{w,T}, i::Integer)
     return array.buffer[i] % T
 end
 

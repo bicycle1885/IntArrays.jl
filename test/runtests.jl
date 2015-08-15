@@ -90,7 +90,7 @@ facts("IntVector") do
         end
     end
 
-    context("several bit widths") do
+    context("each bit width") do
         n = 123
         for T in Ts, w in 1:sizeof(T)*8
             data = rand(T(0):T(2)^w-T(1), n)
@@ -159,6 +159,25 @@ facts("IntVector") do
             end
             @fact isempty(ivec) --> true
         end
+    end
+
+    context("radixsort") do
+        n = 101
+        data = rand(0x00:0x01, n)
+        ivec = IntVector{1}(data)
+        @fact radixsort(ivec) --> issorted
+        @fact radixsort!(ivec) === ivec --> true
+        @fact issorted(ivec) --> true
+        data = rand(0x00:0x03, n)
+        ivec = IntVector{2}(data)
+        @fact radixsort(ivec) --> issorted
+        @fact radixsort!(ivec) === ivec --> true
+        @fact issorted(ivec) --> true
+        data = rand(0x00:0x07, n)
+        ivec = IntVector{3}(data)
+        @fact radixsort(ivec) --> issorted
+        @fact radixsort!(ivec) === ivec --> true
+        @fact issorted(ivec) --> true
     end
 end
 
