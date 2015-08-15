@@ -71,7 +71,18 @@ end
     return x
 end
 
-for w in [1, 2, 4, 8, 16, 32]
+@inline function setindex!(buf::Buffer{1}, x::UInt64, i::Integer)
+    k, r = divrem64(i - 1)
+    bit = UInt64(1) << (W - (r + 1))
+    if x == 0
+        @inbounds buf.data[k+1] &= ~bit
+    else
+        @inbounds buf.data[k+1] |=  bit
+    end
+    return x
+end
+
+for w in [2, 4, 8, 16, 32]
     @eval begin
         @inline function setindex!(buf::Buffer{$w}, x::UInt64, i::Integer)
             k, r = divrem64((i - 1) * $w)
