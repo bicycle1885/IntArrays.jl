@@ -5,12 +5,13 @@ function bench_getindex(array, n)
     for i in 1:endof(array)
         s += array[i]
     end
-    t = @elapsed for _ in 1:n
-        for i in 1:endof(array)
+    best = Inf
+    for _ in 1:n
+        best = min(best, @elapsed for i in 1:endof(array)
             s += array[i]
-        end
+        end)
     end
-    return t / (n * length(array))
+    return best / length(array)
 end
 
 function bench_setindex(array, n)
@@ -18,45 +19,50 @@ function bench_setindex(array, n)
     for i in 1:endof(array)
         array[i] = x
     end
-    t = @elapsed for _ in 1:n
-        for i in 1:endof(array)
+    best = Inf
+    for _ in 1:n
+        best = min(best, @elapsed for i in 1:endof(array)
             array[i] = x
-        end
+        end)
     end
-    return t / (n * length(array))
+    return best / length(array)
 end
 
 function bench_fill0(array, n)
     fill!(array, 0)
-    t = @elapsed for _ in 1:n
-        fill!(array, 0)
+    best = Inf
+    for _ in 1:n
+        best = min(best, @elapsed fill!(array, 0))
     end
-    return t / n
+    return best
 end
 
 function bench_fill1(array, n)
     fill!(array, 0)
-    t = @elapsed for _ in 1:n
-        fill!(array, 1)
+    best = Inf
+    for _ in 1:n
+        best = min(best, @elapsed fill!(array, 1))
     end
-    return t / n
+    return best
 end
 
 function bench_copy(array, n)
     copy(array)
-    t = @elapsed for _ in 1:n
-        copy(array)
+    best = Inf
+    for _ in 1:n
+        best = min(best, @elapsed copy(array))
     end
-    return t / n
+    return best
 end
 
 function bench_copysort(array, n)
     tmp = similar(array)
     sort!(copy!(tmp, array))
-    t = @elapsed for _ in 1:n
-        sort!(copy!(tmp, array))
+    best = Inf
+    for _ in 1:n
+        best = min(best, @elapsed sort!(copy!(tmp, array)))
     end
-    return t / n
+    return best
 end
 
 let
@@ -65,7 +71,7 @@ let
     Ts = [UInt8, UInt16, UInt32, UInt64]
     size = 100_000
     small = 5
-    large = 100
+    large = 10
     benchmarks = [
         (:bench_getindex, large),
         (:bench_setindex, large),
