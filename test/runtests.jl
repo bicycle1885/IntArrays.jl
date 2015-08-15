@@ -98,6 +98,16 @@ facts("IntVector") do
             for i in 1:n
                 @fact ivec[i] --> data[i]
             end
+            for _ in 1:100
+                i = rand(1:n)
+                x::T = rand(T) % w
+                data[i] = x
+                ivec[i] = x
+                @fact ivec[i] --> data[i]
+            end
+            for i in 1:n
+                @fact ivec[i] --> data[i]
+            end
         end
     end
 
