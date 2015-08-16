@@ -18,7 +18,8 @@ import Base:
     copy!,
     resize!,
     push!,
-    pop!
+    pop!,
+    reverse!
 
 include("buffer.jl")
 include("array.jl")

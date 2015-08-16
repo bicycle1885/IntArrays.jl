@@ -30,6 +30,20 @@ function pop!(vector::IntVector)
     return x
 end
 
+function reverse!(vec::IntVector, lo::Integer=1, hi::Integer=endof(vec))
+    return reverse!(vec, Int(lo), Int(hi))
+end
+
+function reverse!(vec::IntVector, lo::Int, hi::Int)
+    if hi ≤ lo
+        return vec
+    end
+    for i in 0:div(hi - lo, 2)
+        vec[lo+i], vec[hi-i] = vec[hi-i], vec[lo+i]
+    end
+    return vec
+end
+
 radixsort(vector::IntVector) = radixsort!(copy(vector))
 
 function radixsort!{w}(vector::IntVector{w})

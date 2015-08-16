@@ -38,8 +38,7 @@ linearindexing{T<:IntArray}(::Type{T}) = Base.LinearFast()
 
 size(array::IntArray) = array.size
 length(array::IntArray) = prod(array.size)
-# TODO: need to add the size of pointers?
-sizeof(array::IntArray) = sizeof(array.buffer.data) + sizeof(array.size)
+sizeof(array::IntArray) = sizeof(array.buffer.data)
 
 @inline function getindex{w,T}(array::IntArray{w,T}, i::Integer)
     if i ≤ 0 || i > endof(array)

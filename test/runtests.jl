@@ -75,6 +75,27 @@ facts("IntArray") do
             @fact ivec --> ones(UInt8, n) * x
         end
     end
+    context("reverse!") do
+        ivec = IntVector{2,UInt8}()
+        @fact reverse!(ivec) === ivec --> true
+        @fact ivec --> isempty
+
+        ivec = IntVector{2}([0x00])
+        @fact reverse!(ivec) === ivec --> true
+        @fact ivec --> [0x00]
+
+        ivec = IntVector{2}([0x00, 0x01])
+        @fact reverse!(ivec) === ivec --> true
+        @fact ivec --> [0x01, 0x00]
+
+        ivec = IntVector{2}([0x00, 0x01, 0x02])
+        @fact reverse!(ivec) === ivec --> true
+        @fact ivec --> [0x02, 0x01, 0x00]
+
+        ivec = IntVector{2}([0x00, 0x01, 0x02, 0x03])
+        @fact reverse!(ivec) === ivec --> true
+        @fact ivec --> [0x03, 0x02, 0x01, 0x00]
+    end
 end
 
 facts("IntVector") do
