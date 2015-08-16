@@ -112,6 +112,10 @@ facts("IntVector") do
             for i in 1:n
                 @fact ivec[i] --> data[i]
             end
+            @fact fill!(ivec, 0x00) === ivec --> true
+            @fact all(ivec .== 0) --> true
+            @fact fill!(ivec, 0x01) === ivec --> true
+            @fact all(ivec .== 1) --> true
         end
     end
 

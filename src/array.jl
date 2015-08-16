@@ -85,9 +85,7 @@ function fill!{w,T}(array::IntArray{w,T}, x::Integer)
     elseif x == (1 << w) - 1
         fill1!(array.buffer)
     else
-        x′ = convert(UInt64, x)
-        x′ &= mask(UInt64, w)
-        fill!(array.buffer, x′ % T, 1, length(array))
+        fill!(array.buffer, x % T)
     end
     return array
 end

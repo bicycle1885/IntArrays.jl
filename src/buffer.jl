@@ -108,21 +108,35 @@ end
     @inbounds return buf.data[i] = x
 end
 
-
-function fill!{w,T}(buf::Buffer{w,T}, x::T, lo::Int, hi::Int)
-    for i in lo:hi
-        setindex!(buf, x, i)
+function fill!{w,T}(buf::Buffer{w,T}, x::T)
+    x &= mask(T, w)
+    W = bitsof(T)
+    cycle = div(lcm(w, W), W)
+    r = 0
+    for j in 1:cycle
+        chunk = T(0)
+        if r < 0
+            chunk |= (x >> (w + r)) << (W + r)
+        end
+        r += W
+        while r > 0
+            chunk >>= min(w, r)
+            chunk  |= x << (W - min(w, r))
+            r -= w
+        end
+        @inbounds for i in j:cycle:endof(buf.data)
+            buf.data[i] = chunk
+        end
     end
     return buf
 end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        function fill!{T}(buf::Buffer{$w,T}, x::T, ::Int, ::Int)
+        function fill!{T}(buf::Buffer{$w,T}, x::T)
             chunk = T(0)
-            W = wordsize(buf)
             x &= mask(T, $w)
-            for _ in 1:div(W, $w)
+            for _ in 1:div(wordsize(buf), $w)
                 chunk = chunk << $w | x
             end
             fill!(buf.data, chunk)
