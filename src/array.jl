@@ -1,14 +1,17 @@
 type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
-    buffer::Buffer{w}
+    buffer::Buffer{w,T}
     size::NTuple{n,Int}
-    function IntArray(buffer::Buffer{w}, size::NTuple{n,Int})
+    function IntArray(buffer::Buffer{w,T}, size::NTuple{n,Int})
+        if w > bitsof(T)
+            error("w = $w cannot be encoded with $T")
+        end
         new(buffer, size)
     end
 end
 
 # call this function when creating an array
 function call{w,T,n}(::Type{IntArray{w,T}}, dims::NTuple{n,Int}, mmap::Bool=false)
-    return IntArray{w,T,n}(Buffer{w}(prod(dims), mmap), dims)
+    return IntArray{w,T,n}(Buffer{w,T}(prod(dims), mmap), dims)
 end
 
 function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
@@ -61,8 +64,8 @@ end
     return unsafe_setindex!(array, x, i)
 end
 
-@inline function unsafe_setindex!(array::IntArray, x::Unsigned, i::Integer)
-    return array.buffer[i] = x % UInt64
+@inline function unsafe_setindex!{w,T}(array::IntArray{w,T}, x::Unsigned, i::Integer)
+    return array.buffer[i] = x % T
 end
 
 function setindex!(array::IntArray, x::Integer, i::Integer, j::Integer...)
@@ -76,14 +79,15 @@ function similar{w}(array::IntArray{w}, T, dims::Dims)
 end
 
 
-function fill!{w}(array::IntArray{w}, x::Integer)
+function fill!{w,T}(array::IntArray{w,T}, x::Integer)
     if x == 0
         fill0!(array.buffer)
     elseif x == (1 << w) - 1
         fill1!(array.buffer)
     else
-        x′ = convert(UInt64, x & rmask(w))
-        fill!(array.buffer, x′, 1, length(array))
+        x′ = convert(UInt64, x)
+        x′ &= mask(UInt64, w)
+        fill!(array.buffer, x′ % T, 1, length(array))
     end
     return array
 end

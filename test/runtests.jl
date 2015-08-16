@@ -12,6 +12,10 @@ facts("IntArray") do
         @fact typeof(imat) --> IntArray{3,UInt8,2}
         @fact eltype(imat) --> UInt8
     end
+    context("overflow") do
+        data = [0x00]
+        @fact_throws Exception IntArray{9}(data)
+    end
     context("getindex") do
         data = [0x00, 0x01, 0x02, 0x03, 0x04]
         ivec = IntArray{3}(data)
@@ -114,6 +118,9 @@ facts("IntVector") do
     context("unsigned integers") do
         n = 1000
         for T in Ts
+            if T === UInt8
+                continue
+            end
             data = rand(T(0):T(100), n)
             ivec = IntVector{10,T}(data)
             for i in 1:endof(data)
@@ -125,9 +132,11 @@ facts("IntVector") do
                 x::T = rand(0:100)
                 data[i] = x
                 ivec[i] = x
+                @assert ivec[i] == data[i]
                 @fact ivec[i] --> data[i]
             end
             for i in 1:endof(data)
+                @assert ivec[i] == data[i]
                 @fact ivec[i] --> data[i]
             end
             @fact_throws BoundsError ivec[n+1]
@@ -212,6 +221,9 @@ facts("IntMatrix") do
         m = 41
         n = 17
         for T in Ts
+            if T === UInt8
+                continue
+            end
             data = rand(T(0):T(100), m, n)
             imat = IntMatrix{10,T}(data)
             for i in 1:m, j in 1:n

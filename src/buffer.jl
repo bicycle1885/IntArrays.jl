@@ -1,108 +1,115 @@
 # internal data for packed integers
-type Buffer{w}
-    data::Vector{UInt64}
+type Buffer{w,T<:Unsigned}
+    data::Vector{T}
     function Buffer(len::Integer, mmap::Bool=false)
-        buflen = cld(len * w, W)
-        data = mmap ? Mmap.mmap(Vector{UInt64}, buflen) : Vector{UInt64}(buflen)
+        @assert w ≤ bitsof(T)
+        buflen = cld(len * w, bitsof(T))
+        data = mmap ? Mmap.mmap(Vector{T}, buflen) : Vector{T}(buflen)
         return new(data)
     end
 end
 
-# word size
-const W = 64
+bitsof{T}(::Type{T}) = sizeof(T) * 8
+wordsize{w,T}(::Buffer{w,T}) = bitsof(T)
 
 function resize!{w}(buffer::Buffer{w}, len::Integer)
-    buflen = cld(len * w, W)
+    buflen = cld(len * w, wordsize(buffer))
     resize!(buffer.data, buflen)
     return buffer
 end
 
-@inline function rmask(w)
-    ~UInt64(0) >> (W - w)
+@inline function mask{T}(::Type{T}, w)
+    ~T(0) >> (bitsof(T) - w)
 end
 
-@inline function mask(r, w)
-    rmask(w) << (W - (r + w))
+@inline function get_chunk_id{w}(::Buffer{w,UInt8}, i::Integer)
+    j = Int(i - 1) * w
+    return (j >> 3) + 1, j & 0b000111
 end
 
-@inline function divrem64(n::Integer)
-    n >> 6, n & 0b111111
+@inline function get_chunk_id{w}(::Buffer{w,UInt16}, i::Integer)
+    j = Int(i - 1) * w
+    return (j >> 4) + 1, j & 0b001111
+end
+
+@inline function get_chunk_id{w}(::Buffer{w,UInt32}, i::Integer)
+    j = Int(i - 1) * w
+    return (j >> 5) + 1, j & 0b011111
+end
+
+@inline function get_chunk_id{w}(::Buffer{w,UInt64}, i::Integer)
+    j = Int(i - 1) * w
+    return (j >> 6) + 1, j & 0b111111
 end
 
 
-@inline function getindex{w}(buf::Buffer{w}, i::Integer)
-    data = buf.data
-    k, r = divrem64((i - 1) * w)
-    if r + w ≤ W
-        @inbounds chunk = (data[k+1] >> (W - (r + w))) & rmask(w)
-    else
-        @inbounds left = (data[k+1] & rmask(W - r)) << ((r + w) - W)
-        @inbounds right = data[k+2] >> (2W - (r + w))
-        chunk = left | right
+@inline function getindex{w,T}(buf::Buffer{w,T}, i::Integer)
+    k, r = get_chunk_id(buf, i)
+    W = bitsof(T)
+    @inbounds begin
+        a = buf.data[k] >> r
+        if r + w ≤ W
+            return a & mask(T, w)
+        else
+            b = buf.data[k+1] & mask(T, (w + r) - W)
+            return a | (b << (W - r))
+        end
     end
-    return chunk
 end
 
 # these width values don't cross a boundary, therefore branching can be safely removed
 for w in [1, 2, 4, 8, 16, 32]
     @eval begin
-        @inline function getindex(buf::Buffer{$w}, i::Integer)
-            k, r = divrem64((i - 1) * $w)
-            @inbounds chunk = (buf.data[k+1] >> ($(W - w) - r)) & $(rmask(w))
-            return chunk
+        @inline function getindex{T}(buf::Buffer{$w,T}, i::Integer)
+            k, r = get_chunk_id(buf, i)
+            @inbounds return (buf.data[k] >> r) & mask(T, $w)
         end
     end
 end
 
-@inline function getindex(buf::Buffer{64}, i::Integer)
+@inline function getindex(buf::Buffer{64,UInt64}, i::Integer)
     @inbounds return buf.data[i]
 end
 
+# https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
+@inline mergebits(a, b, mask) = a $ ((a $ b) & mask)
 
-@inline function setindex!{w}(buf::Buffer{w}, x::UInt64, i::Integer)
-    data = buf.data
-    k, r = divrem64((i - 1) * w)
-    if r + w ≤ W
-        @inbounds data[k+1] = (data[k+1] & ~mask(r, w)) | (x << (W - (r + w)))
-    else
-        @inbounds data[k+1] = (data[k+1] & ~rmask(W - r)) | (x >>> ((r + w) - W))
-        @inbounds data[k+2] = (data[k+2] & ~mask(0, (r + w) - W)) | (x << (2W - (r + w)))
+@inline function setindex!{w,T}(buf::Buffer{w,T}, x::T, i::Integer)
+    k, r = get_chunk_id(buf, i)
+    W = bitsof(T)
+    @inbounds begin
+        a = buf.data[k]
+        b = x << r
+        buf.data[k] = mergebits(a, b, mask(T, w) << r)
+        if r + w > W
+            a = buf.data[k+1]
+            b = x >> (W - r)
+            buf.data[k+1] = mergebits(a, b, mask(T, (w + r) - W))
+        end
     end
-    return x
+    return x & mask(T, w)
 end
 
-@inline function setindex!(buf::Buffer{1}, x::UInt64, i::Integer)
-    k, r = divrem64(i - 1)
-    bit = UInt64(1) << (W - (r + 1))
-    if x == 0
-        @inbounds buf.data[k+1] &= ~bit
-    else
-        @inbounds buf.data[k+1] |=  bit
-    end
-    return x
-end
-
-for w in [2, 4, 8, 16, 32]
+for w in [1, 2, 4, 8, 16, 32]
     @eval begin
-        @inline function setindex!(buf::Buffer{$w}, x::UInt64, i::Integer)
-            k, r = divrem64((i - 1) * $w)
-            k += 1
-            @inbounds a = buf.data[k]
-            b = x << ($(W - w) - r)
-            mask = $(rmask(w)) << ($(W - w) - r)
-            # see: https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
-            @inbounds buf.data[k] = a $ ((a $ b) & mask)
-            return x
+        @inline function setindex!{T}(buf::Buffer{$w,T}, x::T, i::Integer)
+            k, r = get_chunk_id(buf, i)
+            @inbounds begin
+                a = buf.data[k]
+                b = x << r
+                buf.data[k] = mergebits(a, b, mask(T, $w) << r)
+            end
+            return x & mask(T, $w)
         end
     end
 end
 
-@inline function setindex!(buf::Buffer{64}, x::UInt64, i::Integer)
+@inline function setindex!(buf::Buffer{64,UInt64}, x::UInt64, i::Integer)
     @inbounds return buf.data[i] = x
 end
 
 
-function fill!{w}(buf::Buffer{w}, x::UInt64, lo::Int, hi::Int)
+function fill!{w,T}(buf::Buffer{w,T}, x::T, lo::Int, hi::Int)
     for i in lo:hi
         setindex!(buf, x, i)
     end
@@ -111,8 +118,10 @@ end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        function fill!(buf::Buffer{$w}, x::UInt64, ::Int, ::Int)
-            chunk = UInt64(0)
+        function fill!{T}(buf::Buffer{$w,T}, x::T, ::Int, ::Int)
+            chunk = T(0)
+            W = wordsize(buf)
+            x &= mask(T, $w)
             for _ in 1:div(W, $w)
                 chunk = chunk << $w | x
             end
@@ -122,12 +131,12 @@ for w in [1, 2, 4, 8, 16, 32, 64]
     end
 end
 
-function fill0!(buf::Buffer)
-    fill!(buf.data, UInt64(0))
+function fill0!{w,T}(buf::Buffer{w,T})
+    fill!(buf.data, T(0))
     return buf
 end
 
-function fill1!(buf::Buffer)
-    fill!(buf.data, ~UInt64(0))
+function fill1!{w,T}(buf::Buffer{w,T})
+    fill!(buf.data, ~T(0))
     return buf
 end
