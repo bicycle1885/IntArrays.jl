@@ -10,10 +10,9 @@ type Buffer{w,T<:Unsigned}
 end
 
 bitsof{T}(::Type{T}) = sizeof(T) * 8
-wordsize{w,T}(::Buffer{w,T}) = bitsof(T)
 
-function resize!{w}(buffer::Buffer{w}, len::Integer)
-    buflen = cld(len * w, wordsize(buffer))
+function resize!{w,T}(buffer::Buffer{w,T}, len::Integer)
+    buflen = cld(len * w, bitsof(T))
     resize!(buffer.data, buflen)
     return buffer
 end
@@ -136,7 +135,7 @@ for w in [1, 2, 4, 8, 16, 32, 64]
         function fill!{T}(buf::Buffer{$w,T}, x::T)
             chunk = T(0)
             x &= mask(T, $w)
-            for _ in 1:div(wordsize(buf), $w)
+            for _ in 1:div(bitsof(T), $w)
                 chunk = chunk << $w | x
             end
             fill!(buf.data, chunk)
