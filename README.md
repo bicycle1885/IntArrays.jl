@@ -45,6 +45,8 @@ julia> ivec[2]
 0x03
 ```
 
+See [tutorial.ipynb](./tutorial.ipynb) for more details.
+
 ## Benchmark
 
 Micro benchmarks can be found in the [benchmark](./benchmark) directory.
