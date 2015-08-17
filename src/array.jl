@@ -18,6 +18,10 @@ function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
     return IntArray{w,T}((len,), mmap)
 end
 
+function call{w,T}(::Type{IntArray{w,T}}, I::Integer...)
+    return IntArray{w,T}(I)
+end
+
 function call{w,T,n}(::Type{IntArray{w,T,n}}, dims::NTuple{n,Int}, mmap::Bool=false)
     return IntArray{w,T}(dims, mmap)
 end

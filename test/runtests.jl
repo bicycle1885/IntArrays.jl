@@ -12,6 +12,11 @@ facts("IntArray") do
         @fact typeof(imat) --> IntArray{3,UInt8,2}
         @fact eltype(imat) --> UInt8
     end
+    context("construction") do
+        @fact typeof(IntArray{2,UInt8}(1)) --> IntArray{2,UInt8,1}
+        @fact typeof(IntArray{2,UInt8}(1, 2)) --> IntArray{2,UInt8,2}
+        @fact typeof(IntArray{2,UInt8}(1, 2, 3)) --> IntArray{2,UInt8,3}
+    end
     context("overflow") do
         data = [0x00]
         @fact_throws Exception IntArray{9}(data)
