@@ -30,6 +30,15 @@ function pop!(vector::IntVector)
     return x
 end
 
+function append!(vec::IntVector, items::AbstractVector)
+    len = length(vec)
+    resize!(vec, len + length(items))
+    for i in 1:endof(items)
+        vec[len+i] = items[i]
+    end
+    return vec
+end
+
 function reverse!(vec::IntVector, lo::Integer=1, hi::Integer=endof(vec))
     return reverse!(vec, Int(lo), Int(hi))
 end

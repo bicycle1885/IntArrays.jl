@@ -36,6 +36,7 @@ facts("IntArray") do
         @fact imat[1,2] --> 0x02
         @fact (imat[2,1] = 0x0003) --> 0x03
         @fact imat[2,1] --> 0x03
+        @fact (imat[1,1] = 0x04) --> 0x04
     end
     context("sizeof") do
         n = 100
@@ -204,7 +205,13 @@ facts("IntVector") do
             @fact isempty(ivec) --> true
         end
     end
-
+    context("append!") do
+        ivec = IntVector{4}([0x00])
+        append!(ivec, [0x01, 0x02])
+        @fact ivec --> [0x00, 0x01, 0x02]
+        append!(ivec, [3, 4])
+        @fact ivec --> [0x00, 0x01, 0x02, 0x03, 0x04]
+    end
     context("radixsort") do
         n = 101
         data = rand(0x00:0x01, n)
