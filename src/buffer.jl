@@ -57,17 +57,13 @@ end
 end
 
 # these width values don't cross a boundary, therefore branching can be safely removed
-for w in [1, 2, 4, 8, 16, 32]
+for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
         @inline function getindex{T}(buf::Buffer{$w,T}, i::Integer)
             k, r = get_chunk_id(buf, i)
             @inbounds return (buf.data[k] >> r) & mask(T, $w)
         end
     end
-end
-
-@inline function getindex(buf::Buffer{64,UInt64}, i::Integer)
-    @inbounds return buf.data[i]
 end
 
 # https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
@@ -89,7 +85,7 @@ end
     return x & mask(T, w)
 end
 
-for w in [1, 2, 4, 8, 16, 32]
+for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
         @inline function setindex!{T}(buf::Buffer{$w,T}, x::T, i::Integer)
             k, r = get_chunk_id(buf, i)
@@ -101,10 +97,6 @@ for w in [1, 2, 4, 8, 16, 32]
             return x & mask(T, $w)
         end
     end
-end
-
-@inline function setindex!(buf::Buffer{64,UInt64}, x::UInt64, i::Integer)
-    @inbounds return buf.data[i] = x
 end
 
 function fill!{w,T}(buf::Buffer{w,T}, x::T)

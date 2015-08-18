@@ -74,7 +74,7 @@ function setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer
 end
 
 
-function similar{w}(array::IntArray{w}, T, dims::Dims)
+function similar{w,T<:Unsigned}(array::IntArray{w}, ::Type{T}, dims::Dims)
     n = length(dims)
     IntArray{w,T,n}(dims)
 end

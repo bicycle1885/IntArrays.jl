@@ -26,6 +26,11 @@ facts("conversion") do
         @fact typeof(imat) --> IntArray{3,UInt8,2}
         @fact typeof(imat) --> IntMatrix{3,UInt8}
     end
+    context("three-dimensional array") do
+        data = rand(0x00:0x03, 2, 3, 4)
+        iarr = IntArray{2}(data)
+        @fact typeof(iarr) --> IntArray{2,UInt8,3}
+    end
 end
 
 facts("construction") do
@@ -57,6 +62,10 @@ facts("similar") do
         @fact similar(ivec) === ivec --> false
         @fact size(similar(ivec)) --> (10,)
         @fact typeof(similar(ivec)) --> IntVector{2,UInt8}
+        @fact size(similar(ivec, UInt16)) --> (10,)
+        @fact typeof(similar(ivec, UInt16)) --> IntVector{2,UInt16}
+        @fact size(similar(ivec, UInt16, (20,))) --> (20,)
+        @fact typeof(similar(ivec, UInt16, (20,))) --> IntVector{2,UInt16}
     end
 end
 
