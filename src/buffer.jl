@@ -82,7 +82,7 @@ end
             buf.data[k+1] = mergebits(a, b, mask(T, (w + r) - W))
         end
     end
-    return x & mask(T, w)
+    return
 end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
@@ -94,7 +94,7 @@ for w in [1, 2, 4, 8, 16, 32, 64]
                 b = x << r
                 buf.data[k] = mergebits(a, b, mask(T, $w) << r)
             end
-            return x & mask(T, $w)
+            return
         end
     end
 end

@@ -65,7 +65,8 @@ end
 end
 
 @inline function unsafe_setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer)
-    return array.buffer[i] = x % T
+    array.buffer[i] = x % T
+    return array
 end
 
 function setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...)
