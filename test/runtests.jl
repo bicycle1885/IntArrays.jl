@@ -72,7 +72,8 @@ facts("getindex") do
         @fact ivec[5] --> 0x04
         @fact_throws BoundsError ivec[6]
     end
-    context("IntArray") do
+    context("IntMatrix") do
+        # 2x3
         data = [0x00 0x01 0x02; 0x03 0x04 0x05]
         imat = IntArray{4}(data)
         # linear indexing
@@ -92,7 +93,9 @@ facts("getindex") do
         @fact imat[2,1] --> 0x03
         @fact imat[2,2] --> 0x04
         @fact imat[2,3] --> 0x05
+        @fact_throws BoundsError imat[1,4]
         @fact_throws BoundsError imat[2,4]
+        @fact_throws BoundsError imat[3,1]
     end
 end
 
@@ -124,7 +127,8 @@ facts("setindex!") do
         @fact imat[1,1] --> 0x01
         imat[1,3] = 0x03
         @fact imat[1,3] --> 0x03
-        #@fact_throws BoundsError imat[3,1] = 0x01
+        @fact_throws BoundsError imat[1,4] = 0x00
+        @fact_throws BoundsError imat[3,1] = 0x01
     end
 end
 

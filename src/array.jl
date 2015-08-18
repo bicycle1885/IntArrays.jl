@@ -45,9 +45,7 @@ length(array::IntArray) = prod(array.size)
 sizeof(array::IntArray) = sizeof(array.buffer.data)
 
 @inline function getindex{w,T}(array::IntArray{w,T}, i::Integer)
-    if i ≤ 0 || i > endof(array)
-        throw(BoundsError())
-    end
+    checkbounds(array, i)
     return unsafe_getindex(array, i)
 end
 
@@ -57,22 +55,22 @@ end
 
 # when I removed type parameters, array[i] fell into an infinite recursive call...
 function getindex{w,T}(array::IntArray{w,T}, i::Integer, j::Integer...)
-    return array[sub2ind(array.size, i, j...)]
+    checkbounds(array, i, j...)
+    return unsafe_getindex(array, sub2ind(array.size, i, j...))
 end
 
 @inline function setindex!(array::IntArray, x::Unsigned, i::Integer)
-    if i ≤ 0 || i > endof(array)
-        throw(BoundsError())
-    end
+    checkbounds(array, i)
     return unsafe_setindex!(array, x, i)
 end
 
-@inline function unsafe_setindex!{w,T}(array::IntArray{w,T}, x::Unsigned, i::Integer)
+@inline function unsafe_setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer)
     return array.buffer[i] = x % T
 end
 
-function setindex!(array::IntArray, x::Integer, i::Integer, j::Integer...)
-    return array[sub2ind(array.size, i, j...)] = convert(UInt64, x)
+function setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...)
+    checkbounds(array, i, j...)
+    return unsafe_setindex!(array, x, sub2ind(array.size, i, j...))
 end
 
 
