@@ -317,11 +317,11 @@ facts("random run") do
             @fact_throws BoundsError ivec[n+1]
 
             # sort
-            #sort!(data)
-            #radixsort!(ivec)
-            #for i in 1:n
-            #    @fact ivec[i] --> data[i]
-            #end
+            sort!(data)
+            radixsort!(ivec)
+            for i in 1:n
+                @fact ivec[i] --> data[i]
+            end
 
             # random push!/pop!
             for _ in 1:100

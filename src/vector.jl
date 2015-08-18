@@ -59,13 +59,13 @@ function radixsort!{w}(vector::IntVector{w})
     return radixsort!(vector, 1, length(vector), w)
 end
 
-function radixsort!{w}(v::IntVector{w}, lo, hi, k)
+function radixsort!{w,T}(v::IntVector{w,T}, lo, hi, k)
     @assert 1 ≤ k ≤ w
     if lo > hi
         return v
     end
     i, j = lo, hi
-    bit_k = 1 << (k - 1)
+    bit_k = T(1) << (k - 1)
     while i < j
         v_i = v[i]
         if v_i & bit_k == 0
