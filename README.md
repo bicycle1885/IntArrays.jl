@@ -68,8 +68,9 @@ Any pull request that fills the gap is welcome!
 
 ```
 julia> versioninfo()
-Julia Version 0.4.0-dev+6632
-Commit d5b880d* (2015-08-11 18:40 UTC)
+Julia Version 0.4.0-dev+6866
+Commit e0b4510* (2015-08-20 22:06 UTC)
+DEBUG build
 Platform Info:
   System: Darwin (x86_64-apple-darwin14.4.0)
   CPU: Intel(R) Core(TM) i5-4288U CPU @ 2.60GHz

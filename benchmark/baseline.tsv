@@ -1,5 +1,5 @@
-type	eltype	bench_getindex	bench_setindex
-Array{UInt8,1}	UInt8	3.229796e-10	4.10299e-10
-Array{UInt16,1}	UInt16	4.860615e-10	9.568617999999999e-10
-Array{UInt32,1}	UInt32	3.227618e-10	6.543348e-10
-Array{UInt64,1}	UInt64	3.227678e-10	6.555787e-10
+type	eltype	bench_getindex	bench_setindex	bench_fill0	bench_fill1	bench_copy	bench_copysort
+Array{UInt8,1}	UInt8	3.2496000000000003e-10	4.9191e-10	3.724e-6	3.724e-6	4.2894e-5	0.001422692
+Array{UInt16,1}	UInt16	3.2496999999999996e-10	6.5469e-10	7.268e-6	1.7427e-5	9.1165e-5	0.001310798
+Array{UInt32,1}	UInt32	3.2501e-10	6.5616e-10	1.5853e-5	2.2396e-5	0.000170067	0.00167318
+Array{UInt64,1}	UInt64	3.2499000000000003e-10	9.7784e-10	2.8424e-5	3.9043e-5	0.000346832	0.001353904
