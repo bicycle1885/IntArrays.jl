@@ -141,6 +141,18 @@ facts("setindex!") do
     end
 end
 
+facts("comparison") do
+    a = IntVector{2}([0x00, 0x01, 0x02, 0x03])
+    b = IntVector{2}([0x00, 0x01, 0x02, 0x03])
+    c = IntVector{4}([0x00, 0x01, 0x02, 0x03])
+    d = IntVector{2}([0x00, 0x02, 0x02, 0x03])
+    e = IntMatrix{2}([0x00  0x02; 0x01  0x03])
+    @fact a == b --> true
+    @fact a == c --> true
+    @fact a == d --> false
+    @fact a == e --> false
+end
+
 facts("sizeof") do
     context("smaller bits") do
         n = 100
