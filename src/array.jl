@@ -10,19 +10,19 @@ type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
 end
 
 # call this function when creating an array
-function call{w,T,n}(::Type{IntArray{w,T}}, dims::NTuple{n,Int}, mmap::Bool=false)
+function (::Type{IntArray{w,T}}){w,T,n}(dims::NTuple{n,Int}, mmap::Bool=false)
     return IntArray{w,T,n}(Buffer{w,T}(prod(dims), mmap), dims)
 end
 
-function call{w,T}(::Type{IntArray{w,T}}, len::Integer, mmap::Bool=false)
+function (::Type{IntArray{w,T}}){w,T}(len::Integer, mmap::Bool=false)
     return IntArray{w,T}((len,), mmap)
 end
 
-function call{w,T}(::Type{IntArray{w,T}}, I::Integer...)
+function (::Type{IntArray{w,T}}){w,T}(I::Integer...)
     return IntArray{w,T}(I)
 end
 
-function call{w,T,n}(::Type{IntArray{w,T,n}}, dims::NTuple{n,Int}, mmap::Bool=false)
+function (::Type{IntArray{w,T,n}}){w,T,n}(dims::NTuple{n,Int}, mmap::Bool=false)
     return IntArray{w,T}(dims, mmap)
 end
 

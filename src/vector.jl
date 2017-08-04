@@ -1,10 +1,10 @@
 typealias IntVector{w,T} IntArray{w,T,1}
 
-function call{w,T}(::Type{IntVector{w,T}}, len::Integer, mmap::Bool=false)
+function (::Type{IntVector{w,T}}){w,T}(len::Integer, mmap::Bool=false)
     return IntArray{w,T}((len,), mmap)
 end
 
-function call{w,T}(::Type{IntVector{w,T}}, mmap::Bool=false)
+function (::Type{IntVector{w,T}}){w,T}(mmap::Bool=false)
     return IntArray{w,T}((0,), mmap)
 end
 
