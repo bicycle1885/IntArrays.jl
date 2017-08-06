@@ -1,5 +1,5 @@
 # internal data for packed integers
-type Buffer{w,T<:Unsigned}
+struct Buffer{w,T<:Unsigned}
     data::Vector{T}
     function Buffer{w,T}(len::Integer, mmap::Bool=false) where {w,T<:Unsigned}
         @assert w ≤ bitsof(T)
