@@ -11,7 +11,6 @@ export
 
 import Base:
     convert,
-    call,
     getindex,
     setindex!,
     size,
