@@ -1,7 +1,7 @@
 # internal data for packed integers
 type Buffer{w,T<:Unsigned}
     data::Vector{T}
-    function Buffer(len::Integer, mmap::Bool=false)
+    function Buffer{w,T}(len::Integer, mmap::Bool=false) where {w,T<:Unsigned}
         @assert w ≤ bitsof(T)
         buflen = cld(len * w, bitsof(T))
         data = mmap ? Mmap.mmap(Vector{T}, buflen) : Vector{T}(buflen)

@@ -1,7 +1,7 @@
 type IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
     buffer::Buffer{w,T}
     size::NTuple{n,Int}
-    function IntArray(buffer::Buffer{w,T}, size::NTuple{n,Int})
+    function IntArray{w,T,n}(buffer::Buffer{w,T}, size::NTuple{n,Int}) where {w,T,n}
         if w > bitsof(T)
             error("w = $w cannot be encoded with $T")
         end
