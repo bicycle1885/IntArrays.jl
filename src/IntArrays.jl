@@ -12,7 +12,6 @@ export
 import Base:
     convert,
     call,
-    linearindexing,
     getindex,
     setindex!,
     size,

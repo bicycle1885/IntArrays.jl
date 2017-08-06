@@ -38,7 +38,7 @@ function convert{w,T,n}(::Type{IntArray{w}}, array::AbstractArray{T,n})
     return convert(IntArray{w,T,n}, array)
 end
 
-linearindexing{T<:IntArray}(::Type{T}) = Base.LinearFast()
+Base.IndexStyle(::Type{<:IntArray}) = Base.IndexLinear()
 
 size(array::IntArray) = array.size
 length(array::IntArray) = prod(array.size)
