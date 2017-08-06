@@ -67,7 +67,7 @@ for w in [1, 2, 4, 8, 16, 32, 64]
 end
 
 # https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
-@inline mergebits(a, b, mask) = a $ ((a $ b) & mask)
+@inline mergebits(a, b, mask) = a ⊻ ((a ⊻ b) & mask)
 
 @inline function setindex!{w,T}(buf::Buffer{w,T}, x::T, i::Integer)
     k, r = get_chunk_id(buf, i)
