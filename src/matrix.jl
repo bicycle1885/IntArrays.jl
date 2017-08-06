@@ -1,4 +1,4 @@
-typealias IntMatrix{w,T} IntArray{w,T,2}
+const IntMatrix{w,T} = IntArray{w,T,2}
 
 function (::Type{IntMatrix{w,T}}){w,T}(m::Integer, n::Integer, mmap::Bool=false)
     return IntArray{w,T}((m, n), mmap)

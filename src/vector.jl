@@ -1,4 +1,4 @@
-typealias IntVector{w,T} IntArray{w,T,1}
+const IntVector{w,T} = IntArray{w,T,1}
 
 function (::Type{IntVector{w,T}}){w,T}(len::Integer, mmap::Bool=false)
     return IntArray{w,T}((len,), mmap)
