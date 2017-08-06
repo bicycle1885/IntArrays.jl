@@ -10,19 +10,19 @@ mutable struct IntArray{w,T<:Unsigned,n} <: AbstractArray{T,n}
 end
 
 # call this function when creating an array
-function (::Type{IntArray{w,T}}){w,T,n}(dims::NTuple{n,Int}, mmap::Bool=false)
+function IntArray{w,T}(dims::NTuple{n,Int}, mmap::Bool=false) where {w,T,n}
     return IntArray{w,T,n}(Buffer{w,T}(prod(dims), mmap), dims)
 end
 
-function (::Type{IntArray{w,T}}){w,T}(len::Integer, mmap::Bool=false)
+function IntArray{w,T}(len::Integer, mmap::Bool=false) where {w,T}
     return IntArray{w,T}((len,), mmap)
 end
 
-function (::Type{IntArray{w,T}}){w,T}(I::Integer...)
+function IntArray{w,T}(I::Integer...) where {w,T}
     return IntArray{w,T}(I)
 end
 
-function (::Type{IntArray{w,T,n}}){w,T,n}(dims::NTuple{n,Int}, mmap::Bool=false)
+function IntArray{w,T,n}(dims::NTuple{n,Int}, mmap::Bool=false) where {w,T,n}
     return IntArray{w,T}(dims, mmap)
 end
 
