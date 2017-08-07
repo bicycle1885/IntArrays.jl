@@ -1,7 +1,7 @@
 # internal data for packed integers
-type Buffer{w,T<:Unsigned}
+struct Buffer{w,T<:Unsigned}
     data::Vector{T}
-    function Buffer(len::Integer, mmap::Bool=false)
+    function Buffer{w,T}(len::Integer, mmap::Bool=false) where {w,T<:Unsigned}
         @assert w ≤ bitsof(T)
         buflen = cld(len * w, bitsof(T))
         data = mmap ? Mmap.mmap(Vector{T}, buflen) : Vector{T}(buflen)
@@ -67,7 +67,7 @@ for w in [1, 2, 4, 8, 16, 32, 64]
 end
 
 # https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
-@inline mergebits(a, b, mask) = a $ ((a $ b) & mask)
+@inline mergebits(a, b, mask) = a ⊻ ((a ⊻ b) & mask)
 
 @inline function setindex!{w,T}(buf::Buffer{w,T}, x::T, i::Integer)
     k, r = get_chunk_id(buf, i)

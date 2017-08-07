@@ -1,15 +1,16 @@
-isdefined(Base, :__precompile__) && __precompile__()
+__precompile__()
 
 module IntArrays
 
-export IntArray, IntVector, IntMatrix,
+export
+    IntArray,
+    IntVector,
+    IntMatrix,
     radixsort,
     radixsort!
 
 import Base:
     convert,
-    call,
-    linearindexing,
     getindex,
     setindex!,
     size,
