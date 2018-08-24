@@ -1,14 +1,18 @@
 const IntVector{w,T} = IntArray{w,T,1}
 
-function (::Type{IntVector{w,T}}){w,T}(len::Integer, mmap::Bool=false)
+function IntVector{w,T}(len::Integer, mmap::Bool=false) where {w,T}
     return IntArray{w,T}((len,), mmap)
 end
 
-function (::Type{IntVector{w,T}}){w,T}(mmap::Bool=false)
+function IntVector{w,T}(mmap::Bool=false) where {w,T}
     return IntArray{w,T}((0,), mmap)
 end
 
-function convert{w,T}(::Type{IntVector{w}}, vector::AbstractVector{T})
+function IntVector{w}(vector::AbstractVector{T}) where {w,T}
+    return IntArray{w,T,1}(vector)
+end
+
+function convert(::Type{IntVector{w}}, vector::AbstractVector{T}) where {w,T}
     return convert(IntArray{w,T,1}, vector)
 end
 
@@ -33,13 +37,13 @@ end
 function append!(vec::IntVector, items::AbstractVector)
     len = length(vec)
     resize!(vec, len + length(items))
-    for i in 1:endof(items)
+    for i in 1:lastindex(items)
         vec[len+i] = items[i]
     end
     return vec
 end
 
-function reverse!(vec::IntVector, lo::Integer=1, hi::Integer=endof(vec))
+function reverse!(vec::IntVector, lo::Integer=1, hi::Integer=lastindex(vec))
     return reverse!(vec, Int(lo), Int(hi))
 end
 
@@ -55,11 +59,11 @@ end
 
 radixsort(vector::IntVector) = radixsort!(copy(vector))
 
-function radixsort!{w}(vector::IntVector{w})
+function radixsort!(vector::IntVector{w}) where {w}
     return radixsort!(vector, 1, length(vector), w)
 end
 
-function radixsort!{w,T}(v::IntVector{w,T}, lo, hi, k)
+function radixsort!(v::IntVector{w,T}, lo, hi, k) where {w,T}
     @assert 1 ≤ k ≤ w
     if lo > hi
         return v

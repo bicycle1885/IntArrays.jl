@@ -1,7 +1,8 @@
 using IntArrays
-using Base.Test
+using Test
+using Random
 
-srand(12345)
+Random.seed!(12345)
 
 const Ts = (UInt8, UInt16, UInt32, UInt64)
 
@@ -287,11 +288,11 @@ end
 @testset "conversion" begin
     @testset "empty" begin
         for T in Ts, w in 1:sizeof(T)*8
-            data = Vector{T}(0)
+            data = Vector{T}(undef, 0)
             @test typeof(IntArray{w}(data)) == IntArray{w,T,1}
             @test length(IntArray{w}(data)) == 0
 
-            data = Matrix{T}(0, 0)
+            data = Matrix{T}(undef, 0, 0)
             @test typeof(IntArray{w}(data)) == IntArray{w,T,2}
             @test size(IntArray{w}(data)) == (0, 0)
         end

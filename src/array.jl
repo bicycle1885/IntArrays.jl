@@ -26,7 +26,7 @@ function IntArray{w,T,n}(dims::NTuple{n,Int}, mmap::Bool=false) where {w,T,n}
     return IntArray{w,T}(dims, mmap)
 end
 
-function convert{w,T,n}(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n})
+function IntArray{w,T,n}(array::AbstractArray{T,n}) where {w,T,n}
     iarray = IntArray{w,T}(size(array))
     @inbounds for i in eachindex(array)
         iarray[i] = array[i]
@@ -34,7 +34,18 @@ function convert{w,T,n}(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n})
     return iarray
 end
 
-function convert{w,T,n}(::Type{IntArray{w}}, array::AbstractArray{T,n})
+function convert(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n}) where {w,T,n}
+    return IntArray{w,T,n}(array)
+end
+
+# resolve a method ambiguity with Base
+convert(::Type{IntArray{w,T,n}}, array::IntArray{w,T,n}) where {w,T,n} = array
+
+function IntArray{w}(array::AbstractArray{T,n}) where {w,T,n}
+    return IntArray{w,T,n}(array)
+end
+
+function convert(::Type{IntArray{w}}, array::AbstractArray{T,n}) where {w,T,n}
     return convert(IntArray{w,T,n}, array)
 end
 
@@ -44,19 +55,19 @@ size(array::IntArray) = array.size
 length(array::IntArray) = prod(array.size)
 sizeof(array::IntArray) = sizeof(array.buffer.data)
 
-@inline function getindex{w,T}(array::IntArray{w,T}, i::Integer)
+@inline function getindex(array::IntArray{w,T}, i::Integer) where {w,T}
     checkbounds(array, i)
     return unsafe_getindex(array, i)
 end
 
-@inline function unsafe_getindex{w,T}(array::IntArray{w,T}, i::Integer)
+@inline function unsafe_getindex(array::IntArray{w,T}, i::Integer) where {w,T}
     return array.buffer[i] % T
 end
 
 # when I removed type parameters, array[i] fell into an infinite recursive call...
-function getindex{w,T}(array::IntArray{w,T}, i::Integer, j::Integer...)
+function getindex(array::IntArray{w,T}, i::Integer, j::Integer...) where {w,T}
     checkbounds(array, i, j...)
-    return unsafe_getindex(array, sub2ind(array.size, i, j...))
+    return unsafe_getindex(array, LinearIndices(array.size)[i, j...])
 end
 
 @inline function setindex!(array::IntArray, x::Unsigned, i::Integer)
@@ -64,24 +75,24 @@ end
     return unsafe_setindex!(array, x, i)
 end
 
-@inline function unsafe_setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer)
+@inline function unsafe_setindex!(array::IntArray{w,T}, x::Integer, i::Integer) where {w,T}
     array.buffer[i] = x % T
     return array
 end
 
-function setindex!{w,T}(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...)
+function setindex!(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...) where {w,T}
     checkbounds(array, i, j...)
-    return unsafe_setindex!(array, x, sub2ind(array.size, i, j...))
+    return unsafe_setindex!(array, x, LinearIndices(array.size)[i, j...])
 end
 
 
-function similar{w,T<:Unsigned}(array::IntArray{w}, ::Type{T}, dims::Dims)
+function similar(array::IntArray{w}, ::Type{T}, dims::Dims) where {w,T<:Unsigned}
     n = length(dims)
     IntArray{w,T,n}(dims)
 end
 
 
-function fill!{w,T}(array::IntArray{w,T}, x::Integer)
+function fill!(array::IntArray{w,T}, x::Integer) where {w,T}
     if x == 0
         fill0!(array.buffer)
     elseif x == (1 << w) - 1
@@ -93,13 +104,13 @@ function fill!{w,T}(array::IntArray{w,T}, x::Integer)
 end
 
 
-function copy!{w}(a::IntArray{w}, b::IntArray{w})
+function copy!(a::IntArray{w}, b::IntArray{w}) where {w}
     len_a = length(a)
     len_b = length(b)
     if len_a < len_b
         throw(BoundsError())
     elseif len_a == len_b
-        copy!(a.buffer.data, b.buffer.data)
+        copyto!(a.buffer.data, b.buffer.data)
     else
         for i in 1:len_b
             a[i] = b[i]
