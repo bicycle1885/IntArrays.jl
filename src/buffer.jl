@@ -4,45 +4,45 @@ struct Buffer{w,T<:Unsigned}
     function Buffer{w,T}(len::Integer, mmap::Bool=false) where {w,T<:Unsigned}
         @assert w ≤ bitsof(T)
         buflen = cld(len * w, bitsof(T))
-        data = mmap ? Mmap.mmap(Vector{T}, buflen) : Vector{T}(buflen)
+        data = mmap ? Mmap.mmap(Vector{T}, buflen) : Vector{T}(undef, buflen)
         return new(data)
     end
 end
 
-bitsof{T}(::Type{T}) = sizeof(T) * 8
+bitsof(::Type{T}) where {T} = sizeof(T) * 8
 
-function resize!{w,T}(buffer::Buffer{w,T}, len::Integer)
+function resize!(buffer::Buffer{w,T}, len::Integer) where {w,T}
     buflen = cld(len * w, bitsof(T))
     resize!(buffer.data, buflen)
     return buffer
 end
 
-@inline function mask{T}(::Type{T}, w)
+@inline function mask(::Type{T}, w) where {T}
     ~T(0) >> (bitsof(T) - w)
 end
 
-@inline function get_chunk_id{w}(::Buffer{w,UInt8}, i::Integer)
+@inline function get_chunk_id(::Buffer{w,UInt8}, i::Integer) where {w}
     j = Int(i - 1) * w
     return (j >> 3) + 1, j & 0b000111
 end
 
-@inline function get_chunk_id{w}(::Buffer{w,UInt16}, i::Integer)
+@inline function get_chunk_id(::Buffer{w,UInt16}, i::Integer) where {w}
     j = Int(i - 1) * w
     return (j >> 4) + 1, j & 0b001111
 end
 
-@inline function get_chunk_id{w}(::Buffer{w,UInt32}, i::Integer)
+@inline function get_chunk_id(::Buffer{w,UInt32}, i::Integer) where {w}
     j = Int(i - 1) * w
     return (j >> 5) + 1, j & 0b011111
 end
 
-@inline function get_chunk_id{w}(::Buffer{w,UInt64}, i::Integer)
+@inline function get_chunk_id(::Buffer{w,UInt64}, i::Integer) where {w}
     j = Int(i - 1) * w
     return (j >> 6) + 1, j & 0b111111
 end
 
 
-@inline function getindex{w,T}(buf::Buffer{w,T}, i::Integer)
+@inline function getindex(buf::Buffer{w,T}, i::Integer) where {w,T}
     k, r = get_chunk_id(buf, i)
     W = bitsof(T)
     @inbounds begin
@@ -59,7 +59,7 @@ end
 # these width values don't cross a boundary, therefore branching can be safely removed
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        @inline function getindex{T}(buf::Buffer{$w,T}, i::Integer)
+        @inline function getindex(buf::Buffer{$w,T}, i::Integer) where {T}
             k, r = get_chunk_id(buf, i)
             @inbounds return (buf.data[k] >> r) & mask(T, $w)
         end
@@ -69,7 +69,7 @@ end
 # https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
 @inline mergebits(a, b, mask) = a ⊻ ((a ⊻ b) & mask)
 
-@inline function setindex!{w,T}(buf::Buffer{w,T}, x::T, i::Integer)
+@inline function setindex!(buf::Buffer{w,T}, x::T, i::Integer) where {w,T}
     k, r = get_chunk_id(buf, i)
     W = bitsof(T)
     @inbounds begin
@@ -87,7 +87,7 @@ end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        @inline function setindex!{T}(buf::Buffer{$w,T}, x::T, i::Integer)
+        @inline function setindex!(buf::Buffer{$w,T}, x::T, i::Integer) where {T}
             k, r = get_chunk_id(buf, i)
             @inbounds begin
                 a = buf.data[k]
@@ -99,7 +99,7 @@ for w in [1, 2, 4, 8, 16, 32, 64]
     end
 end
 
-function fill!{w,T}(buf::Buffer{w,T}, x::T)
+function fill!(buf::Buffer{w,T}, x::T) where {w,T}
     x &= mask(T, w)
     W = bitsof(T)
     cycle = div(lcm(w, W), W)
@@ -124,7 +124,7 @@ end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        function fill!{T}(buf::Buffer{$w,T}, x::T)
+        function fill!(buf::Buffer{$w,T}, x::T) where {T}
             chunk = T(0)
             x &= mask(T, $w)
             for _ in 1:div(bitsof(T), $w)
@@ -136,12 +136,12 @@ for w in [1, 2, 4, 8, 16, 32, 64]
     end
 end
 
-function fill0!{w,T}(buf::Buffer{w,T})
+function fill0!(buf::Buffer{w,T}) where {w,T}
     fill!(buf.data, T(0))
     return buf
 end
 
-function fill1!{w,T}(buf::Buffer{w,T})
+function fill1!(buf::Buffer{w,T}) where {w,T}
     fill!(buf.data, ~T(0))
     return buf
 end

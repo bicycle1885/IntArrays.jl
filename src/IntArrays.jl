@@ -2,6 +2,8 @@ __precompile__()
 
 module IntArrays
 
+using Mmap
+
 export
     IntArray,
     IntVector,
