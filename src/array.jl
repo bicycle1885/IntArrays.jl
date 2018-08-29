@@ -56,7 +56,7 @@ Base.length(array::IntArray) = prod(array.size)
 Base.sizeof(array::IntArray) = sizeof(array.buffer.data)
 
 @inline function Base.getindex(array::IntArray{w,T}, i::Integer) where {w,T}
-    checkbounds(array, i)
+    @boundscheck checkbounds(array, i)
     return unsafe_getindex(array, i)
 end
 
@@ -66,12 +66,12 @@ end
 
 # when I removed type parameters, array[i] fell into an infinite recursive call...
 function Base.getindex(array::IntArray{w,T}, i::Integer, j::Integer...) where {w,T}
-    checkbounds(array, i, j...)
+    @boundscheck checkbounds(array, i, j...)
     return unsafe_getindex(array, LinearIndices(array.size)[i, j...])
 end
 
 @inline function Base.setindex!(array::IntArray, x::Unsigned, i::Integer)
-    checkbounds(array, i)
+    @boundscheck checkbounds(array, i)
     return unsafe_setindex!(array, x, i)
 end
 
@@ -81,7 +81,7 @@ end
 end
 
 function Base.setindex!(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...) where {w,T}
-    checkbounds(array, i, j...)
+    @boundscheck checkbounds(array, i, j...)
     return unsafe_setindex!(array, x, LinearIndices(array.size)[i, j...])
 end
 
