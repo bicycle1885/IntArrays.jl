@@ -12,6 +12,6 @@ function IntMatrix{w}(matrix::AbstractMatrix{T}) where {w,T}
     return IntArray{w,T,2}(matrix)
 end
 
-function convert(::Type{IntMatrix{w}}, matrix::AbstractMatrix{T}) where {w,T}
+function Base.convert(::Type{IntMatrix{w}}, matrix::AbstractMatrix{T}) where {w,T}
     return convert(IntArray{w,T,2}, matrix)
 end

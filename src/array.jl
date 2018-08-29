@@ -34,28 +34,28 @@ function IntArray{w,T,n}(array::AbstractArray{T,n}) where {w,T,n}
     return iarray
 end
 
-function convert(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n}) where {w,T,n}
+function Base.convert(::Type{IntArray{w,T,n}}, array::AbstractArray{T,n}) where {w,T,n}
     return IntArray{w,T,n}(array)
 end
 
 # resolve a method ambiguity with Base
-convert(::Type{IntArray{w,T,n}}, array::IntArray{w,T,n}) where {w,T,n} = array
+Base.convert(::Type{IntArray{w,T,n}}, array::IntArray{w,T,n}) where {w,T,n} = array
 
 function IntArray{w}(array::AbstractArray{T,n}) where {w,T,n}
     return IntArray{w,T,n}(array)
 end
 
-function convert(::Type{IntArray{w}}, array::AbstractArray{T,n}) where {w,T,n}
+function Base.convert(::Type{IntArray{w}}, array::AbstractArray{T,n}) where {w,T,n}
     return convert(IntArray{w,T,n}, array)
 end
 
 Base.IndexStyle(::Type{<:IntArray}) = Base.IndexLinear()
 
-size(array::IntArray) = array.size
-length(array::IntArray) = prod(array.size)
-sizeof(array::IntArray) = sizeof(array.buffer.data)
+Base.size(array::IntArray) = array.size
+Base.length(array::IntArray) = prod(array.size)
+Base.sizeof(array::IntArray) = sizeof(array.buffer.data)
 
-@inline function getindex(array::IntArray{w,T}, i::Integer) where {w,T}
+@inline function Base.getindex(array::IntArray{w,T}, i::Integer) where {w,T}
     checkbounds(array, i)
     return unsafe_getindex(array, i)
 end
@@ -65,12 +65,12 @@ end
 end
 
 # when I removed type parameters, array[i] fell into an infinite recursive call...
-function getindex(array::IntArray{w,T}, i::Integer, j::Integer...) where {w,T}
+function Base.getindex(array::IntArray{w,T}, i::Integer, j::Integer...) where {w,T}
     checkbounds(array, i, j...)
     return unsafe_getindex(array, LinearIndices(array.size)[i, j...])
 end
 
-@inline function setindex!(array::IntArray, x::Unsigned, i::Integer)
+@inline function Base.setindex!(array::IntArray, x::Unsigned, i::Integer)
     checkbounds(array, i)
     return unsafe_setindex!(array, x, i)
 end
@@ -80,19 +80,19 @@ end
     return array
 end
 
-function setindex!(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...) where {w,T}
+function Base.setindex!(array::IntArray{w,T}, x::Integer, i::Integer, j::Integer...) where {w,T}
     checkbounds(array, i, j...)
     return unsafe_setindex!(array, x, LinearIndices(array.size)[i, j...])
 end
 
 
-function similar(array::IntArray{w}, ::Type{T}, dims::Dims) where {w,T<:Unsigned}
+function Base.similar(array::IntArray{w}, ::Type{T}, dims::Dims) where {w,T<:Unsigned}
     n = length(dims)
     IntArray{w,T,n}(dims)
 end
 
 
-function fill!(array::IntArray{w,T}, x::Integer) where {w,T}
+function Base.fill!(array::IntArray{w,T}, x::Integer) where {w,T}
     if x == 0
         fill0!(array.buffer)
     elseif x == (1 << w) - 1
