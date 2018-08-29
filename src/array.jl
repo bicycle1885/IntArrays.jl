@@ -104,7 +104,7 @@ function Base.fill!(array::IntArray{w,T}, x::Integer) where {w,T}
 end
 
 
-function copy!(a::IntArray{w}, b::IntArray{w}) where {w}
+function Base.copy!(a::IntArray{w}, b::IntArray{w}) where {w}
     len_a = length(a)
     len_b = length(b)
     if len_a < len_b

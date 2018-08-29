@@ -9,8 +9,6 @@ export
     radixsort,
     radixsort!
 
-import Base: copy!
-
 include("buffer.jl")
 include("array.jl")
 include("vector.jl")
