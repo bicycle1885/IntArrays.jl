@@ -9,21 +9,7 @@ export
     radixsort,
     radixsort!
 
-import Base:
-    convert,
-    getindex,
-    setindex!,
-    size,
-    length,
-    sizeof,
-    similar,
-    fill!,
-    copy!,
-    resize!,
-    push!,
-    pop!,
-    append!,
-    reverse!
+import Base: copy!
 
 include("buffer.jl")
 include("array.jl")

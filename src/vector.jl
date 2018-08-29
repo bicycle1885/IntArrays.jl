@@ -12,29 +12,29 @@ function IntVector{w}(vector::AbstractVector{T}) where {w,T}
     return IntArray{w,T,1}(vector)
 end
 
-function convert(::Type{IntVector{w}}, vector::AbstractVector{T}) where {w,T}
+function Base.convert(::Type{IntVector{w}}, vector::AbstractVector{T}) where {w,T}
     return convert(IntArray{w,T,1}, vector)
 end
 
-function resize!(vector::IntVector, len::Integer)
+function Base.resize!(vector::IntVector, len::Integer)
     resize!(vector.buffer, len)
     vector.size = (len,)
     return vector
 end
 
-function push!(vector::IntVector, x::Integer)
+function Base.push!(vector::IntVector, x::Integer)
     resize!(vector, length(vector) + 1)
     vector[end] = x
     return vector
 end
 
-function pop!(vector::IntVector)
+function Base.pop!(vector::IntVector)
     x = vector[end]
     resize!(vector, length(vector) - 1)
     return x
 end
 
-function append!(vec::IntVector, items::AbstractVector)
+function Base.append!(vec::IntVector, items::AbstractVector)
     len = length(vec)
     resize!(vec, len + length(items))
     for i in 1:lastindex(items)
@@ -43,11 +43,11 @@ function append!(vec::IntVector, items::AbstractVector)
     return vec
 end
 
-function reverse!(vec::IntVector, lo::Integer=1, hi::Integer=lastindex(vec))
+function Base.reverse!(vec::IntVector, lo::Integer=1, hi::Integer=lastindex(vec))
     return reverse!(vec, Int(lo), Int(hi))
 end
 
-function reverse!(vec::IntVector, lo::Int, hi::Int)
+function Base.reverse!(vec::IntVector, lo::Int, hi::Int)
     if hi ≤ lo
         return vec
     end

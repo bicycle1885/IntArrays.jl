@@ -11,7 +11,7 @@ end
 
 bitsof(::Type{T}) where {T} = sizeof(T) * 8
 
-function resize!(buffer::Buffer{w,T}, len::Integer) where {w,T}
+function Base.resize!(buffer::Buffer{w,T}, len::Integer) where {w,T}
     buflen = cld(len * w, bitsof(T))
     resize!(buffer.data, buflen)
     return buffer
@@ -42,7 +42,7 @@ end
 end
 
 
-@inline function getindex(buf::Buffer{w,T}, i::Integer) where {w,T}
+@inline function Base.getindex(buf::Buffer{w,T}, i::Integer) where {w,T}
     k, r = get_chunk_id(buf, i)
     W = bitsof(T)
     @inbounds begin
@@ -59,7 +59,7 @@ end
 # these width values don't cross a boundary, therefore branching can be safely removed
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        @inline function getindex(buf::Buffer{$w,T}, i::Integer) where {T}
+        @inline function Base.getindex(buf::Buffer{$w,T}, i::Integer) where {T}
             k, r = get_chunk_id(buf, i)
             @inbounds return (buf.data[k] >> r) & mask(T, $w)
         end
@@ -69,7 +69,7 @@ end
 # https://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge
 @inline mergebits(a, b, mask) = a ⊻ ((a ⊻ b) & mask)
 
-@inline function setindex!(buf::Buffer{w,T}, x::T, i::Integer) where {w,T}
+@inline function Base.setindex!(buf::Buffer{w,T}, x::T, i::Integer) where {w,T}
     k, r = get_chunk_id(buf, i)
     W = bitsof(T)
     @inbounds begin
@@ -87,7 +87,7 @@ end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        @inline function setindex!(buf::Buffer{$w,T}, x::T, i::Integer) where {T}
+        @inline function Base.setindex!(buf::Buffer{$w,T}, x::T, i::Integer) where {T}
             k, r = get_chunk_id(buf, i)
             @inbounds begin
                 a = buf.data[k]
@@ -99,7 +99,7 @@ for w in [1, 2, 4, 8, 16, 32, 64]
     end
 end
 
-function fill!(buf::Buffer{w,T}, x::T) where {w,T}
+function Base.fill!(buf::Buffer{w,T}, x::T) where {w,T}
     x &= mask(T, w)
     W = bitsof(T)
     cycle = div(lcm(w, W), W)
@@ -124,7 +124,7 @@ end
 
 for w in [1, 2, 4, 8, 16, 32, 64]
     @eval begin
-        function fill!(buf::Buffer{$w,T}, x::T) where {T}
+        function Base.fill!(buf::Buffer{$w,T}, x::T) where {T}
             chunk = T(0)
             x &= mask(T, $w)
             for _ in 1:div(bitsof(T), $w)
