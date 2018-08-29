@@ -1,8 +1,0 @@
-plot.pdf
-plot_files
-*.png
-
-!getindex_UInt8.png
-!setindex_UInt8.png
-!getindex_UInt64.png
-!setindex_UInt64.png

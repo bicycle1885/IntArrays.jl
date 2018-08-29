@@ -53,41 +53,7 @@ julia> ivec[2]
 
 See [tutorial.ipynb](./tutorial.ipynb) for more details.
 
-## Benchmark
-
-Micro benchmarks can be found in the [benchmark](./benchmark) directory.
-
-The `getindex` and `setindex!` methods of `IntArray` are 2-7 times slower than those of raw arrays due to the heavy bit operations.
-Any pull request that fills the gap is welcome!
-
-**UInt8**
-
-![Benchmark of getindex on UInt8](./benchmark/getindex_UInt8.png?raw=true)
-![Benchmark of setindex on UInt8](./benchmark/setindex_UInt8.png?raw=true)
-
-**UInt64**
-
-![Benchmark of getindex on UInt64](./benchmark/getindex_UInt64.png?raw=true)
-![Benchmark of setindex on UInt64](./benchmark/setindex_UInt64.png?raw=true)
-
----
-
-```
-julia> versioninfo()
-Julia Version 0.4.0-dev+6866
-Commit e0b4510* (2015-08-20 22:06 UTC)
-DEBUG build
-Platform Info:
-  System: Darwin (x86_64-apple-darwin14.4.0)
-  CPU: Intel(R) Core(TM) i5-4288U CPU @ 2.60GHz
-  WORD_SIZE: 64
-  BLAS: libopenblas (USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell)
-  LAPACK: libopenblas
-  LIBM: libopenlibm
-  LLVM: libLLVM-3.3
-```
-
 ## Plan
 
-* Behave more like normal arrays
-* Store signed integers
+* Make it behave more like usual arrays.
+* Store signed integers.
